@@ -20,9 +20,12 @@ import bgs99c.lab2.TeamLog;
 import bgs99c.lab2.shared.FighterStats;
 import bgs99c.lab2.shared.LogId;
 
+import javax.swing.*;
+
 
 public class BattleController {
-	public static Client client;
+	private Client client;
+	private JFrame frame;
 	public LogId apid = null;
 	public Map<LogId, FighterStats> fightersA = new LinkedHashMap<>(), fightersB = new LinkedHashMap<>();
 	public FighterStats curA, curB;
@@ -43,6 +46,7 @@ public class BattleController {
 	private Image aImage, bImage;
 	private Panel aPane, bPane;
 	private Button turnButton, battleButton;
+    List<String> losers = new ArrayList<>();
 	private void turn() throws CloneNotSupportedException {
 		turn++;
 		//System.out.println(teamAList.getItems().size());
@@ -78,7 +82,7 @@ public class BattleController {
 					team.get(pd.getSubject()).health -= pd.getDamage();
 					
 
-					//damageAnimation(pd.getDamage(), l.getPlayer().equals(apid) ? aDamage : bDamage);
+					damageAnimation(pd.getDamage(), l.getPlayer().equals(apid) ? aDamage : bDamage);
 					
 					updateFighters(team);
 					break;
@@ -88,7 +92,7 @@ public class BattleController {
 						break;
 					oteam.get(al.getSubject()).health -= al.getResult().getDamage();
 					
-					//damageAnimation(al.getResult().getDamage(), l.getPlayer().equals(apid) ? bDamage : aDamage);
+					damageAnimation(al.getResult().getDamage(), l.getPlayer().equals(apid) ? bDamage : aDamage);
 					updateFighters(oteam);
 					break;
 				case DEATH:
@@ -133,7 +137,7 @@ public class BattleController {
 				players.remove(0);
 				players.add(winner);
 			}
-			//losers.add(ranks.get(battle++));
+			losers.add(ranks.get(battle++));
 			updatePlayers();
 		}
 	}
@@ -218,6 +222,11 @@ public class BattleController {
 			//teamBList.setItems(res);
 		}
 	}
+
+	public BattleController(Client client, JFrame frame){
+        this.client = client;
+        this.frame = frame;
+    }
 	public void initialize() throws ClassNotFoundException, IOException, CloneNotSupportedException{
 		if(logDisplay == null)
 			return;
@@ -227,7 +236,7 @@ public class BattleController {
 		players = client.getPlayers();
 		ranks = client.getRanks();
 		res = client.getResults();
-		//losersList.setItems(losers);
+		losersList.setItems(losers);
 		updatePlayers();
 		turn();
 	}

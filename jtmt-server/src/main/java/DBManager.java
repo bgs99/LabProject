@@ -17,10 +17,10 @@ public class DBManager {
 	public UserStats[] getUsers() throws SQLException {
 		Timestamp last = lastTournament();
 		PreparedStatement st = conn.prepareStatement("SELECT name, AVG(ta.position), tb.position" +
-				" FROM login LEFT JOIN tournaments as ta on login.id = player" +
+				" FROM logins LEFT JOIN tournaments as ta on logins.id = player" +
 				" left join (select player, position FROM tournaments where date = ?) as tb" +
-				" on login.id = tb.player" +
-				" group by login.id, name, tb.position");
+				" on logins.id = tb.player" +
+				" group by logins.id, name, tb.position");
 		st.setTimestamp(1, last);
 		ResultSet rs = st.executeQuery();
 		List<UserStats> ls = new ArrayList<>();
@@ -33,7 +33,7 @@ public class DBManager {
 	public void recordTournament(List<String> players) throws SQLException {
 		Timestamp ts = new Timestamp((new java.util.Date()).getTime());
 		for(int i = 0; i < players.size(); i++) {
-			PreparedStatement st = conn.prepareStatement("INSERT INTO tournaments(date, player, position) VALUES (?, (SELECT id FROM login WHERE name = ?), ?)");
+			PreparedStatement st = conn.prepareStatement("INSERT INTO tournaments(date, player, position) VALUES (?, (SELECT id FROM logins WHERE name = ?), ?)");
 			st.setTimestamp(1, ts);
 			st.setString(2, players.get(i));
 			st.setInt(3, players.size()- i);
@@ -56,7 +56,7 @@ public class DBManager {
 	}
 	public boolean checkPassword(String name, String password, byte sessionSalt) throws SQLException {
 		Statement st = conn.createStatement();
-		ResultSet rs = st.executeQuery("SELECT password FROM login WHERE name = '"+name + "'");
+		ResultSet rs = st.executeQuery("SELECT password FROM logins WHERE name = '"+name + "'");
 		rs.next();
 		String spass = rs.getString(1);
 		
@@ -70,7 +70,7 @@ public class DBManager {
 		String pass = Security.saltUTFString(password, salt);
 		Statement st = conn.createStatement();
 		try {
-			st.executeUpdate("INSERT INTO login VALUES ('"+name+"','"+pass+"',"+salt+")");
+			st.executeUpdate("INSERT INTO logins VALUES ('"+name+"','"+pass+"',"+salt+")");
 		}catch (SQLException e) {
 			st.close();
 			return false;
@@ -79,7 +79,7 @@ public class DBManager {
 		return true;
 	}
 	public byte getSalt(String name) throws SQLException {
-		PreparedStatement st = conn.prepareStatement("SELECT salt FROM login WHERE name = ?");
+		PreparedStatement st = conn.prepareStatement("SELECT salt FROM logins WHERE name = ?");
 		st.setString(1, name);
 		ResultSet rs = st.executeQuery();
 		if(!rs.next()) {

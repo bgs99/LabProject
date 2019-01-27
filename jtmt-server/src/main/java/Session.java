@@ -115,7 +115,7 @@ public final class Session implements Closeable, Runnable{
 	public void run() {
 		try {
 			while(!login());
-				System.out.println("User " + name + " logged in");
+			System.out.println("User " + name + " logged in");
 			UserStats[] users = lm.getUsers();
 			game = new Game(users);
 			
