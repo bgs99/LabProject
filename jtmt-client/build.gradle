@@ -15,7 +15,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-    compile project(':lab2')
+    compile project(':lab2interface')
     compile project(':jtmt-shared')
     compile 'com.jcraft:jsch:+'
 }
