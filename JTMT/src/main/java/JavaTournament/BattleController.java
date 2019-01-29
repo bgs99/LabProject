@@ -1,6 +1,7 @@
 package JavaTournament;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -20,36 +21,132 @@ import bgs99c.lab2.TeamLog;
 import bgs99c.lab2.shared.FighterStats;
 import bgs99c.lab2.shared.LogId;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+
+import static java.awt.GridBagConstraints.BOTH;
+import static java.awt.GridBagConstraints.RELATIVE;
+import static java.awt.GridBagConstraints.WEST;
 
 
 public class BattleController {
+
+    private class MultiLabel extends JLabel{
+        public MultiLabel() {
+            super();
+        }
+        public MultiLabel(String text){
+            super("<html>" + text.replace("\n", "<br>"));
+        }
+
+        @Override
+        public void setText(String text){
+            super.setText("<html>" + text.replace("\n", "<br>"));
+        }
+    }
+
+
 	private Client client;
 	private JFrame frame;
-	public LogId apid = null;
-	public Map<LogId, FighterStats> fightersA = new LinkedHashMap<>(), fightersB = new LinkedHashMap<>();
-	public FighterStats curA, curB;
-	public int turn = -1;
-	public int battle = 0;
-	List<Record> res;
-	public BattleController() {}
-	List<String> players;
-	List<String> ranks;
-	/*private ListView<HBox> teamAList;
-	private ListView<HBox> teamBList;
-	private List<HBox> playersList;
-	private List<String> losersList;*/
-	private Label logDisplay;
-	private Label aName, bName;
-	private Label aStats, bStats;
-	private Label aDamage, bDamage;
+	private LogId apid = null;
+	private Map<LogId, FighterStats> fightersA = new LinkedHashMap<>(), fightersB = new LinkedHashMap<>();
+	private FighterStats curA, curB;
+	private int turn = -1;
+	private int battle = 0;
+	private List<Record> res;
+	public BattleController(Client client, JFrame frame) {
+	    this.client = client;
+	    this.frame = frame;
+
+        /*fightersA.clear();
+        fightersB.clear();*/
+        try {
+            players = client.getPlayers();
+            ranks = client.getRanks();
+            res = client.getResults();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+        /*losersList.clear();
+        losersList.addAll(losers);*/
+
+        playersList = new JList<>();
+
+        updatePlayers();
+
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.anchor = WEST;
+        c.fill = BOTH;
+        c.gridx = 0;
+        c.gridy = RELATIVE;
+
+        playersList = new JList<>();
+        panel.add(playersList, c);
+        losersList = new JList<>();
+        panel.add(losersList, c);
+
+        logDisplay = new MultiLabel();
+        panel.add(logDisplay, c);
+
+        c.gridx = 1;
+        c.gridy = 0;
+        aName = new MultiLabel();
+        panel.add(aName, c);
+        c.gridy = RELATIVE;
+        aStats = new MultiLabel();
+        panel.add(aStats, c);
+        aDamage = new MultiLabel();
+        panel.add(aDamage, c);
+        teamAList = new JList<>();
+        panel.add(teamAList, c);
+        turnButton = new Button("Step");
+        panel.add(turnButton, c);
+
+        c.gridx = 2;
+        c.gridy = 0;
+        bName = new MultiLabel();
+        panel.add(bName, c);
+        c.gridy = RELATIVE;
+        bStats = new MultiLabel();
+        panel.add(bStats, c);
+        bDamage = new MultiLabel();
+        panel.add(bDamage, c);
+        teamBList = new JList<>();
+        panel.add(teamBList, c);
+        battleButton = new Button("Skip");
+        panel.add(battleButton, c);
+
+
+        battleButton.setEnabled(false);
+
+        frame.setContentPane(panel);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(1000, 600);
+        frame.setVisible(true);
+
+        turnButton.addActionListener(this::turn);
+
+        turn(null);
+    }
+	private List<String> players;
+	private List<String> ranks;
+	private JList<Box> teamAList;
+	private JList<Box> teamBList;
+	private JList<MultiLabel> playersList;
+	private JList<MultiLabel> losersList;
+	private MultiLabel logDisplay;
+	private MultiLabel aName, bName;
+	private MultiLabel aStats, bStats;
+	private MultiLabel aDamage, bDamage;
 	private Image aImage, bImage;
-	private Panel aPane, bPane;
 	private Button turnButton, battleButton;
-    List<String> losers = new ArrayList<>();
-	private void turn() throws CloneNotSupportedException {
+    private List<String> losers = new ArrayList<>();
+	private void turn(ActionEvent event) {
 		turn++;
-		//System.out.println(teamAList.getItems().size());
 		List<Log> logs = res.get(turn).logs;
 		
 		for(Log l : logs) {
@@ -143,7 +240,7 @@ public class BattleController {
 	}
 	
 	
-	private void damageAnimation(int amount, Label target) {
+	private void damageAnimation(int amount, MultiLabel target) {
 		int dir = target == aDamage? 1 : -1;
 		/*SequentialTransition st = new SequentialTransition();
 		ParallelTransition pt = new ParallelTransition();
@@ -169,76 +266,45 @@ public class BattleController {
 	}
 	
 	private void updatePlayers() {
-		//ObservableList<HBox> res = FXCollections.observableArrayList();
+        playersList.removeAll();
 		for(int i = 0; i < players.size()/2;i++) {
-			Label a = new Label(players.get(i*2));
-			Label b = new Label(players.get(i*2+1));
-			Label vs = new Label("vs");
-			/*HBox hb = new HBox();
-			hb.setSpacing(20d);
-			hb.getChildren().addAll(a, vs, b);
-			res.add(hb);*/
+            playersList.add(new MultiLabel(players.get(i*2) + " vs " + players.get(i*2+1)));
 		}
 		if(players.size() % 2 > 0) {
-			Label a = new Label(players.get(players.size()-1));
-			/*HBox hb = new HBox();
-			hb.setSpacing(20d);
-			hb.getChildren().addAll(a);
-			res.add(hb);Text*/
+            playersList.add(new MultiLabel(players.get(players.size()-1)));
 		}
-		//playersList.setItems(res);
 	}
 	private void updateFighters(Map<LogId, FighterStats> team) {
-		//ObservableList<HBox> res = FXCollections.observableArrayList();
+        JList<Box> res = team == fightersA ? teamAList : teamBList;
+        res.removeAll();
 		for(LogId li : team.keySet()) {
-			Label name = new Label(li.name);
-			Label health = new Label("" + team.get(li).health + "/" + team.get(li).maxhealth);
-			/*HBox hb = new HBox();
-			hb.setSpacing(10d);
-			hb.getChildren().addAll(name, health);
-			res.add(hb);*/
+			MultiLabel name = new MultiLabel(li.name);
+			MultiLabel health = new MultiLabel("" + team.get(li).health + "/" + team.get(li).maxhealth);
+			Box hb = Box.createHorizontalBox();
+			hb.add(name);
+			hb.add(Box.createHorizontalStrut(20));
+			hb.add(health);
+			res.add(hb);
 		}
 		if(team == fightersA) {
 			aName.setText(curA.name);
 			aStats.setText(curA.toString());
 			try {
-				//aImage.setImage(new Image(curA.img));
+				aImage = ImageIO.read(new URL(curA.img));
 			} catch(Exception e) {
 				System.out.println(e.getMessage());
-				//aImage.setImage(null);
+				aImage = null;
 			}
-			//teamAList.setItems(res);
 		} else {
 			bName.setText(curB.name);
 			bStats.setText(curB.toString());
 			try {
 				System.out.println(curB.img);
-				
-				//bImage.setImage(new Image(curB.img));
+				bImage = ImageIO.read(new URL(curB.img));
 			} catch(Exception e) {
 				System.out.println(e.getMessage());
-				//bImage.setImage(null);
+				bImage = null;
 			}
-			//teamBList.setItems(res);
 		}
 	}
-
-	public BattleController(Client client, JFrame frame){
-        this.client = client;
-        this.frame = frame;
-    }
-	public void initialize() throws ClassNotFoundException, IOException, CloneNotSupportedException{
-		if(logDisplay == null)
-			return;
-		fightersA.clear();
-		fightersB.clear();
-		battleButton.setEnabled(false);
-		players = client.getPlayers();
-		ranks = client.getRanks();
-		res = client.getResults();
-		losersList.setItems(losers);
-		updatePlayers();
-		turn();
-	}
-	
 }

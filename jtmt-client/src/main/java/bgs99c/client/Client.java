@@ -157,12 +157,11 @@ public class Client implements Closeable {
 			lock.unlock();
 		}
 	}
+	@SuppressWarnings("unchecked")
 	public List<Record> getResults() throws IOException, ClassNotFoundException {
 		lock.lock();
 		try {
-			@SuppressWarnings("unchecked")
-			List<Record> ret = (List<Record>) ois.readObject();
-			return ret;
+			return (List<Record>) ois.readObject();
 		} finally {
 			lock.unlock();
 		}

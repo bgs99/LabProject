@@ -8,4 +8,7 @@ public final class ReplacementLog extends Log {
         return replacement;
     }
     private LogId replacement;
+    ReplacementLog(FighterInfo original, FighterInfo replacement, Player player){
+        super(LogType.REPLACEMENT, original, player);
+    }
 }

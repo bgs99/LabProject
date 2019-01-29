@@ -78,7 +78,7 @@ public final class Session implements Closeable, Runnable{
 		ois = new ObjectInputStream(input);
 	}
 	
-	public void acceptFeedback() throws IOException {
+	private void acceptFeedback() throws IOException {
 		System.out.println("*** " + ois.readUTF());
 		System.out.println("*** " + name);
 	}
@@ -89,7 +89,7 @@ public final class Session implements Closeable, Runnable{
 		connectionSocket.close();
 	}
 	
-	public synchronized void makeTournament() throws IOException, SQLException {
+	private synchronized void makeTournament() throws IOException, SQLException {
 		List<String> ranks = game.Tournament();
 		oos.writeObject(Game.getPlayers());
 		oos.writeObject(ranks);
@@ -97,7 +97,7 @@ public final class Session implements Closeable, Runnable{
 		oos.flush();
 		Game.clearLogs();
 	}
-	public synchronized void makeBattle(String opponent) throws IOException, SQLException {
+	private synchronized void makeBattle(String opponent) throws IOException, SQLException {
 		String winner = game.Battle(this.name, opponent);
 		List<String> ps = new ArrayList<String>();
 		ps.add(name);
@@ -114,7 +114,10 @@ public final class Session implements Closeable, Runnable{
 	@Override
 	public void run() {
 		try {
-			while(!login());
+			while(!login()){
+
+			}
+
 			System.out.println("User " + name + " logged in");
 			UserStats[] users = lm.getUsers();
 			game = new Game(users);

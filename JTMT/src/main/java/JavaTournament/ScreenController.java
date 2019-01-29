@@ -117,7 +117,7 @@ public class ScreenController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //Main.createScene((AnchorPane)null, "BattleScreen.fxml");
+        new BattleController(client, frame);
 	}
 	
 	private void startBattle(ActionEvent event) {
@@ -126,7 +126,7 @@ public class ScreenController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //Main.createScene((AnchorPane)null, "BattleScreen.fxml");
+        new BattleController(client, frame);
 	}
 	
 }
