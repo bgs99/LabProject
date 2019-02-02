@@ -5,7 +5,7 @@ import java.io.Serializable;
 import bgs99c.lab2.shared.LogId;
 
 public abstract class Log implements Serializable{
-	static final long serialVersionUID = 42L;
+	public static final long serialVersionUID = 42L;
     Log(LogType t, FighterInfo s, Player o){
         type = t;
         subject = new LogId(s.toString(), s.hashCode());

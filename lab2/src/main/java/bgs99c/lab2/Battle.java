@@ -20,7 +20,7 @@ public final class Battle {
     	log.add(l);
     	turnLog.add(l);
     }
-    public Team getTeam(Player p) {
+    Team getTeam(Player p) {
     	if(p == teamA.player)
     		return teamA;
     	if(p == teamB.player)
@@ -43,13 +43,9 @@ public final class Battle {
         teamB.winState = GameState.BWON;
     }
     
-    public Player init() {
-    	FutureTask<Boolean> initA = new FutureTask<Boolean>(() -> {
-            return teamA.init();
-        });
-        FutureTask<Boolean> initB = new FutureTask<Boolean>(() -> {
-            return teamB.init();
-        });
+    private Player init() {
+    	FutureTask<Boolean> initA = new FutureTask<>(() -> teamA.init());
+        FutureTask<Boolean> initB = new FutureTask<>(() -> teamB.init());
         initA.run();
         initB.run();
         try {
@@ -82,9 +78,7 @@ public final class Battle {
         GameState current;
 
         while(true){
-            FutureTask<GameState> turn = new FutureTask<GameState>(() -> {
-                return makeTurn();
-            });
+            FutureTask<GameState> turn = new FutureTask<>(this::makeTurn);
             try {
                 turn.run();
                 current = turn.get(2, TimeUnit.SECONDS);

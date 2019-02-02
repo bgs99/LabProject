@@ -9,6 +9,6 @@ public final class TeamLog extends Log {
 		// TODO Auto-generated constructor stub
 	}
 	public FighterStats fs;
-	private static final long serialVersionUID = 42L;
+	public static final long serialVersionUID = 42L;
 
 }

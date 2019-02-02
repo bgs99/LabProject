@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Record implements Serializable{
-	static final long serialVersionUID = 42L;
+	public static final long serialVersionUID = 42L;
 	public StringBuilder msgs = new StringBuilder();
 	public List<Log> logs = new ArrayList<>();
 }

@@ -8,7 +8,7 @@ public abstract class Fighter extends FighterInfo{
     final static int LVLPOINTS = 5;
     private final static int MAXMOVES = 5;
     
-    FighterStats getStats() {
+    public FighterStats getStats() {
     	FighterStats ret = new FighterStats();
     	ret.accuracy = accuracy;
     	ret.defence = defence;
@@ -18,7 +18,6 @@ public abstract class Fighter extends FighterInfo{
     	ret.health = health;
     	ret.img = image;
     	ret.name = this.toString();
-    	System.out.println(ret.img);
     	return ret;
     }
     
