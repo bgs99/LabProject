@@ -1,6 +1,7 @@
 package bgs99c.lab2;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
@@ -42,63 +43,58 @@ public final class Battle {
         teamA.winState = GameState.AWON;
         teamB.winState = GameState.BWON;
     }
-    
-    private Player init() {
-    	FutureTask<Boolean> initA = new FutureTask<>(() -> teamA.init());
-        FutureTask<Boolean> initB = new FutureTask<>(() -> teamB.init());
-        initA.run();
-        initB.run();
-        try {
-            if (!initA.get(1, TimeUnit.SECONDS)) return teamB.player;
-        }catch (Exception e){
-            e.printStackTrace();
-            return teamB.player;
-        }
-        try {
-            if (!initB.get(1, TimeUnit.SECONDS)) return teamA.player;
-        }catch (Exception e){
-            e.printStackTrace();
-            return teamA.player;
-        }
 
-        initA = new FutureTask<>(() -> {
-            teamA.player.getStrategy().init(this);
-            return true;
-        });
-        initB = new FutureTask<>(() -> {
-            teamB.player.getStrategy().init(this);
-            return true;
-        });
+    private Object pass = new Object();
+    private MySecurityManager sm = new MySecurityManager(pass);
 
-        initA.run();
-        initB.run();
+    private Player fail = null;
 
+    private void runUntrusted(Callable<Boolean> task, Player fail) throws Exception {
+        FutureTask<Boolean> futureTask = new FutureTask<>(task);
+        futureTask.run();
         try {
-            initA.get(1, TimeUnit.SECONDS);
+            if (!futureTask.get(1, TimeUnit.SECONDS))
+                throw new Exception("Player failed to initialize");
         }catch (Exception e){
             e.printStackTrace();
-            return teamB.player;
+            this.fail = fail;
+            throw new Exception();
         }
-        try {
-            initB.get(1, TimeUnit.SECONDS);
-        }catch (Exception e){
-            e.printStackTrace();
-            return teamA.player;
-        }
-    	
-    	return null;
     }
-    
+
+    private Player init() {
+        try {
+            runUntrusted(() -> teamA.init(), teamB.player);
+            runUntrusted(() -> teamB.init(), teamA.player);
+            runUntrusted(() -> {
+                teamA.player.getStrategy().init(this);
+                return true;
+            }, teamB.player);
+            runUntrusted(() -> {
+                teamB.player.getStrategy().init(this);
+                return true;
+            }, teamA.player);
+            return null;
+        } catch (Exception e) {
+            return this.fail;
+        }
+    }
+
     /**
      * Runs battle simulation and returns the winner
      */
     public Player start(){
+
+        SecurityManager old = System.getSecurityManager();
+        System.setSecurityManager(sm);
 
     	Player inp = init();
     	if(inp != null)
     		return inp;
     	
         GameState current;
+
+        Player winner = null;
 
         while(true){
             FutureTask<GameState> turn = new FutureTask<>(this::makeTurn);
@@ -109,12 +105,24 @@ public final class Battle {
             catch(Exception e){
                 e.printStackTrace();
                 OutputLogger.log("Exception in async");
-                return opponentInfo().player;
+                winner = opponentInfo().player;
+                break;
             }
 
-            if(current == GameState.AWON) return teamA.player;
-            else if(current == GameState.BWON) return teamB.player;
+            if(current == GameState.AWON) {
+                winner = teamA.player;
+                break;
+            }
+            else if(current == GameState.BWON) {
+                winner = teamB.player;
+                break;
+            }
         }
+
+        sm.disable(pass);
+        System.setSecurityManager(old);
+
+        return winner;
     }
 
     private GameState makeTurn(){

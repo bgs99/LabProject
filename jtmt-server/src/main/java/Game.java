@@ -31,6 +31,7 @@ public class Game {
 		return OutputLogger.getLogs();
 	}
 	public String Battle(String user, String opponent) {
+
 		Battle b = new Battle(players.get(user), players.get(opponent));
 		String name = b.start().getClass().getName();
 		return name;
