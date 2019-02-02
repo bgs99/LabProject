@@ -16,14 +16,6 @@ lab2-shared - some shared classes between game engine and interface
 lab2interface - interface for the client side, users will be building their teams using it
 
 
-These interfaces were requestes by @bleizard so clients won't see how game engine works
-
-Subject for future discussion
-
-
-If this idea is still supported it lab2 should be refactored to implement lab2-interface instead of relying on manual duplication of code
-
-
 Deps:
 
 
