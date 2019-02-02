@@ -1,9 +1,6 @@
 package bgs99c.lab2;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
@@ -19,10 +16,9 @@ public final class Tournament {
     public Tournament(Player[] c){
     	OutputLogger.log("Tournament started!");
         contestants = new LinkedList<>();
-        for(Player p : c)
-            contestants.add(p);
+        Collections.addAll(contestants, c);
     }
-    Queue<Player> contestants;
+    private Queue<Player> contestants;
 
     /**
      * Runs tournament simulation
@@ -39,7 +35,7 @@ public final class Tournament {
             Player b = contestants.poll();
             Battle f = new Battle(a, b);
             Player winner = f.start();
-            FutureTask<Boolean> evolve = new FutureTask<Boolean>(() -> {
+            FutureTask<Boolean> evolve = new FutureTask<>(() -> {
                 winner.getStrategy().applyEvolve(winner);
                 return true;
             });

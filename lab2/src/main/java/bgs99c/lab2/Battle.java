@@ -49,19 +49,42 @@ public final class Battle {
         initA.run();
         initB.run();
         try {
-            if (!initA.get()) return teamB.player;
+            if (!initA.get(1, TimeUnit.SECONDS)) return teamB.player;
         }catch (Exception e){
             e.printStackTrace();
             return teamB.player;
         }
         try {
-            if (!initB.get()) return teamA.player;
+            if (!initB.get(1, TimeUnit.SECONDS)) return teamA.player;
         }catch (Exception e){
             e.printStackTrace();
             return teamA.player;
         }
-        teamA.player.getStrategy().init(this);
-        teamB.player.getStrategy().init(this);
+
+        initA = new FutureTask<>(() -> {
+            teamA.player.getStrategy().init(this);
+            return true;
+        });
+        initB = new FutureTask<>(() -> {
+            teamB.player.getStrategy().init(this);
+            return true;
+        });
+
+        initA.run();
+        initB.run();
+
+        try {
+            initA.get(1, TimeUnit.SECONDS);
+        }catch (Exception e){
+            e.printStackTrace();
+            return teamB.player;
+        }
+        try {
+            initB.get(1, TimeUnit.SECONDS);
+        }catch (Exception e){
+            e.printStackTrace();
+            return teamA.player;
+        }
     	
     	return null;
     }
@@ -81,7 +104,7 @@ public final class Battle {
             FutureTask<GameState> turn = new FutureTask<>(this::makeTurn);
             try {
                 turn.run();
-                current = turn.get(2, TimeUnit.SECONDS);
+                current = turn.get(1, TimeUnit.SECONDS);
             }
             catch(Exception e){
                 e.printStackTrace();
