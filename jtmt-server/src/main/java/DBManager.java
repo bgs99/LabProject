@@ -1,95 +1,61 @@
-import java.io.PrintStream;
-import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
-import bgs99c.shared.Security;
 import bgs99c.shared.UserStats;
+import models.*;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 
 public class DBManager {
-	Connection conn;
-	public Timestamp lastTournament() throws SQLException {
-		Statement st = conn.createStatement();
-		ResultSet rs = st.executeQuery("Select MAX(date) from tournaments");
-		rs.next();
-		return rs.getTimestamp(1);
-	}
-	public UserStats[] getUsers() throws SQLException {
-		Timestamp last = lastTournament();
-		PreparedStatement st = conn.prepareStatement("SELECT name, AVG(ta.position), tb.position" +
-				" FROM logins LEFT JOIN tournaments as ta on logins.id = player" +
-				" left join (select player, position FROM tournaments where date = ?) as tb" +
-				" on logins.id = tb.player" +
-				" group by logins.id, name, tb.position");
-		st.setTimestamp(1, last);
-		ResultSet rs = st.executeQuery();
-		List<UserStats> ls = new ArrayList<>();
-		while(rs.next()) {
-			ls.add(new UserStats(rs.getString(1), rs.getInt(3), rs.getInt(2), 0, Loader.teamInfo(rs.getString(1))));
-		}
-		
-		return ls.toArray(new UserStats[] {});
-	}
-	public void recordTournament(List<String> players) throws SQLException {
-		Timestamp ts = new Timestamp((new java.util.Date()).getTime());
-		for(int i = 0; i < players.size(); i++) {
-			PreparedStatement st = conn.prepareStatement("INSERT INTO tournaments(date, player, position) VALUES (?, (SELECT id FROM logins WHERE name = ?), ?)");
-			st.setTimestamp(1, ts);
-			st.setString(2, players.get(i));
-			st.setInt(3, players.size()- i);
-		}
-	}
-	private String localCon = "jdbc:postgresql:studs";
-	private String remoteCon = "jdbc:postgresql://pg/studs";
-	public DBManager() throws SQLException{
-		PrintStream err = System.err;
-		try {
-			System.setErr(null);
-			conn = DriverManager.getConnection(localCon);
-		} catch (SQLException e) {
-			System.out.println("Local DB not found, trying to connect to host pg...");
-			conn = DriverManager.getConnection(remoteCon, "s242322", "waw657");
-		} finally {
-			System.setErr(err);
-		}
+	private EntityManager manager;
 
-	}
-	public boolean checkPassword(String name, String password, byte sessionSalt) throws SQLException {
-		Statement st = conn.createStatement();
-		ResultSet rs = st.executeQuery("SELECT password FROM logins WHERE name = '"+name + "'");
-		rs.next();
-		String spass = rs.getString(1);
+    DBManager() {
+        EntityManagerFactory factory = Persistence.createEntityManagerFactory( "HIBERNATE_JPA" );
+        manager = factory.createEntityManager();
+    }
+
+	UserStats[] getUsers() {
+		Stream<User> st = manager.createNamedQuery("User.findAll", User.class).getResultStream();
 		
-		rs.close();
-		st.close();
-		
-		return Security.saltHashString(spass, sessionSalt).equals(password);
+		return st.map(q -> new UserStats(
+                        q.getName(),
+                        q.lastScore(),
+                        q.averageScore(),
+                        0,
+                        Loader.teamInfo(q.getName())
+                )).toArray(UserStats[]::new);
 	}
-	public boolean addUser(String name, String password) throws SQLException {
-		byte salt = Security.createSalt();
-		String pass = Security.saltUTFString(password, salt);
-		Statement st = conn.createStatement();
-		try {
-			st.executeUpdate("INSERT INTO logins VALUES ('"+name+"','"+pass+"',"+salt+")");
-		}catch (SQLException e) {
-			st.close();
-			return false;
+
+	public void recordTournament(List<String> players) {
+		for(int i = 0; i < players.size(); i++) {
+            manager.persist(new Tournament(
+                    manager.createNamedQuery("User.findByName", User.class)
+                        .setParameter("name", players.get(i)).getSingleResult(),
+                    players.size() - i
+            ));
 		}
-		st.close();
+	}
+
+	public boolean checkPassword(String name, String password, byte sessionSalt) {
+		User u = manager.createNamedQuery("User.findByName", User.class)
+				.setParameter("name", name).getSingleResult();
+        if(u == null)
+            return false;
+
+        return u.checkPassword(password, sessionSalt);
+	}
+	public boolean addUser(String name, String password) {
+		if(manager.createNamedQuery("User.findByName", User.class)
+                .setParameter("name", name).getResultList().size() > 0) {
+		    System.out.println("User " + name + " is already registered");
+		    return false;
+        }
+		User u = new User(name, password);
+		manager.getTransaction().begin();
+		manager.persist(u);
+		manager.getTransaction().commit();
 		return true;
-	}
-	public byte getSalt(String name) throws SQLException {
-		PreparedStatement st = conn.prepareStatement("SELECT salt FROM logins WHERE name = ?");
-		st.setString(1, name);
-		ResultSet rs = st.executeQuery();
-		if(!rs.next()) {
-			rs.close();
-			st.close();
-			throw new SQLException();
-		}
-		byte res = rs.getByte(1);
-		rs.close();
-		st.close();
-		return res;
 	}
 }

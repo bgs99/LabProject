@@ -18,6 +18,7 @@ import bgs99c.lab2.Player;
 import bgs99c.shared.FighterStats;
 import bgs99c.lab2.Fighter;
 
+
 public class Loader {
 	private static Map<String, URLClassLoader> classLoaders = new HashMap<String, URLClassLoader>();
 	
