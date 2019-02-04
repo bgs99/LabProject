@@ -38,25 +38,25 @@ public final class Session implements Closeable, Runnable{
 		ois = new ObjectInputStream(input);
 	}
 	
-	public boolean login() throws IOException, SQLException {
+	public boolean login() throws IOException {
 		System.out.println("Login attempt");
 		String name = ois.readUTF();
 		System.out.println("Name provided: " + name);
 		byte salt = 0;
-		/*try {
-			salt = lm.getSalt(name);
+		try {
+			salt = dbManager.getSalt(name);
 		} catch (Exception e) {
 			oos.write(1);
 			oos.flush();
 			return false;
-		}*/
+		}
 		oos.write(0);
 		oos.write(salt);
 		byte sessionSalt = Security.createSalt();
 		oos.write(sessionSalt);
 		oos.flush();
 		String pass = ois.readUTF();
-		boolean success = true; //TODO: fix it back//lm.checkPassword(name, pass, sessionSalt);
+		boolean success = dbManager.checkPassword(name, pass, sessionSalt);
 		oos.write(success? 0 : 1);
 		oos.flush();
 		this.name = name;

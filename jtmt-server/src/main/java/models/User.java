@@ -55,4 +55,8 @@ public class User {
     public boolean checkPassword(String password, byte sessionSalt){
         return Security.saltHashString(this.password, sessionSalt).equals(password);
     }
+
+    public byte getSalt() {
+        return salt;
+    }
 }

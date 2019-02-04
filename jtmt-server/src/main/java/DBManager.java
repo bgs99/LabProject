@@ -38,6 +38,12 @@ public class DBManager {
 		}
 	}
 
+	public byte getSalt(String name) {
+    	User u = manager.createNamedQuery("User.findByName", User.class).setParameter("name", name)
+				.getSingleResult();
+    	return u.getSalt();
+	}
+
 	public boolean checkPassword(String name, String password, byte sessionSalt) {
 		User u = manager.createNamedQuery("User.findByName", User.class)
 				.setParameter("name", name).getSingleResult();
