@@ -8,13 +8,18 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-public class DBManager {
+class DBManager {
 	private EntityManager manager;
 
     DBManager() {
         EntityManagerFactory factory = Persistence.createEntityManagerFactory( "HIBERNATE_JPA" );
         manager = factory.createEntityManager();
     }
+
+    private User getUserByName(String name) {
+		return manager.createNamedQuery("User.findByName", User.class).setParameter("name", name)
+				.getResultStream().findAny().orElse(null);
+	}
 
 	UserStats[] getUsers() {
 		Stream<User> st = manager.createNamedQuery("User.findAll", User.class).getResultStream();
@@ -28,33 +33,30 @@ public class DBManager {
                 )).toArray(UserStats[]::new);
 	}
 
-	public void recordTournament(List<String> players) {
+	void recordTournament(List<String> players) {
+    	manager.getTransaction().begin();
 		for(int i = 0; i < players.size(); i++) {
             manager.persist(new Tournament(
-                    manager.createNamedQuery("User.findByName", User.class)
-                        .setParameter("name", players.get(i)).getSingleResult(),
+                    getUserByName(players.get(i)),
                     players.size() - i
             ));
 		}
+		manager.getTransaction().commit();
 	}
 
-	public byte getSalt(String name) {
-    	User u = manager.createNamedQuery("User.findByName", User.class).setParameter("name", name)
-				.getSingleResult();
-    	return u.getSalt();
+	byte getSalt(String name) {
+    	return getUserByName(name).getSalt();
 	}
 
-	public boolean checkPassword(String name, String password, byte sessionSalt) {
-		User u = manager.createNamedQuery("User.findByName", User.class)
-				.setParameter("name", name).getSingleResult();
+	boolean checkPassword(String name, String password, byte sessionSalt) {
+		User u = getUserByName(name);
         if(u == null)
             return false;
 
         return u.checkPassword(password, sessionSalt);
 	}
-	public boolean addUser(String name, String password) {
-		if(manager.createNamedQuery("User.findByName", User.class)
-                .setParameter("name", name).getResultList().size() > 0) {
+	boolean addUser(String name, String password) {
+		if(getUserByName(name) != null) {
 		    System.out.println("User " + name + " is already registered");
 		    return false;
         }

@@ -93,6 +93,7 @@ public final class Session implements Closeable, Runnable{
 	
 	private synchronized void makeTournament() throws IOException, SQLException {
 		List<String> ranks = game.Tournament();
+		dbManager.recordTournament(ranks);
 		oos.writeObject(Game.getPlayers());
 		oos.writeObject(ranks);
 		oos.writeObject(Game.getLogs());
