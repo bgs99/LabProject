@@ -9,15 +9,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public class Server implements Closeable{
-	DBManager loginManager;
+	private DBManager loginManager;
 	private ThreadPoolExecutor executor = 
 			  (ThreadPoolExecutor) Executors.newCachedThreadPool();
 	private ServerSocket serverSocket;
-	public Server() throws SQLException {
+	public Server() {
 		loginManager = new DBManager();
 	}
 	public void init() {
-		int port = new Config().getPort();
+		int port = Config.getPort();
 		try {
 			serverSocket = new ServerSocket(port);
 		} catch(Exception e) {

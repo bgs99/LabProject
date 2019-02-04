@@ -5,20 +5,20 @@ import java.io.FileReader;
 import java.util.Properties;
 
 public class Config {
-    private Properties properties = new Properties();
-    public Config() {
+    private static Properties properties = new Properties();
+    static  {
         try {
-            properties.load(getClass().getResourceAsStream("/server.properties"));
+            properties.load(Config.class.getResourceAsStream("/server.properties"));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public int getPort() {
+    public static int getPort() {
         return Integer.parseInt(properties.getProperty("port"));
     }
 
-    public String getHost() {
+    public static String getHost() {
         return properties.getProperty("host");
     }
 }

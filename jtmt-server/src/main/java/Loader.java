@@ -6,10 +6,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.stream.Stream;
@@ -98,7 +95,6 @@ public class Loader {
 	/**
 	 * Loads given jar file
 	 * @param name Name of the loaded jar file with extension
-	 * @throws IOException 
 	 */
 	public static void load(String name) {
 		try {
@@ -107,7 +103,7 @@ public class Loader {
 			
 			URLClassLoader cl = new URLClassLoader(new URL[] {
 					new URL("file:"+PD+name),
-					new URL("file:" + IN)
+					//new URL("file:" + IN)
 					}, Loader.class.getClassLoader());
 			classLoaders.put(name, cl);
 			System.out.println(name);
@@ -116,9 +112,18 @@ public class Loader {
 			e.printStackTrace();
 		}
 	}
+
+	static {
+		Properties config = new Properties();
+		try {
+			config.load(Loader.class.getResourceAsStream("/storage.properties"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		PD = Paths.get(config.getProperty("dir")).toAbsolutePath().toString() + "/";
+	}
 	/**
 	 * Path to players' jars
 	 */
-	public static String PD = Paths.get("pd/").toAbsolutePath().toString() + "/";
-	public static String IN = Paths.get("lib/lab2.jar").toAbsolutePath().toString();
+	public static String PD;
 }

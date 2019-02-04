@@ -40,9 +40,8 @@ public class Client implements Closeable {
 	public boolean init(String name, String pass) throws IOException {
 		InputStream input;
 		OutputStream output;
-		Config config = new Config();
 
-		socket = new Socket(config.getHost(), config.getPort());
+		socket = new Socket(Config.getHost(), Config.getPort());
 		input = socket.getInputStream();
 		output = socket.getOutputStream();
 
