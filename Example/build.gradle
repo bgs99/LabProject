@@ -17,12 +17,3 @@ targetCompatibility = 1.8
 dependencies {
     compile project(':lab2interface')
 }
-
-jar {
-    manifest {
-        attributes 'Main-Class': 'Player4'
-    }
-    from {
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-}

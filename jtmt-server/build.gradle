@@ -24,6 +24,8 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
+    compile 'org.hibernate:hibernate-core:+'
+    compile 'org.hibernate:hibernate-c3p0:+'
     compile 'org.postgresql:postgresql:+'
     compile project(':jtmt-shared')
     compile project(':lab2')

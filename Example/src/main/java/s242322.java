@@ -26,7 +26,7 @@ class SimpleStrategy extends Strategy{
         return null;
     }
 }
-class s242322 extends Player{
+public class s242322 extends Player{
     public s242322(){
         super("BR034241436", new SimpleStrategy());
     }

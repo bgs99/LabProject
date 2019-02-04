@@ -33,14 +33,12 @@ public class Game {
 	public String Battle(String user, String opponent) {
 
 		Battle b = new Battle(players.get(user), players.get(opponent));
-		String name = b.start().getClass().getName();
-		return name;
+		return b.start().getClass().getName();
 	}
 	public List<String> Tournament() {
 		Tournament t = new Tournament(players.values().toArray(new Player[] {}));
 		List<Player> ranks = t.start();
-		List<String> names = ranks.stream().map(x -> x.getClass().getName()).collect(Collectors.toList());
-		return names;
+		return ranks.stream().map(x -> x.getClass().getName()).collect(Collectors.toList());
 	}
 	public void Test() {
 		Player p1 = Loader.loadPlayer("s242322");
