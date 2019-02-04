@@ -21,10 +21,10 @@ import java.util.stream.Collectors;
 import com.jcraft.jsch.*;
 
 public class Client implements Closeable {
-	ObjectOutputStream oos;
-	ObjectInputStream ois;
-	Socket socket = null;
-	Lock lock = new ReentrantLock();
+	private ObjectOutputStream oos;
+	private ObjectInputStream ois;
+	private Socket socket = null;
+	private Lock lock = new ReentrantLock();
 	public String name;
 
 	@Override
@@ -40,34 +40,18 @@ public class Client implements Closeable {
 	public boolean init(String name, String pass) throws IOException {
 		InputStream input;
 		OutputStream output;
-		try {
-			boolean debug = true;
-			if(debug){
-				socket = new Socket("localhost", 18888);
-				input = socket.getInputStream();
-				output = socket.getOutputStream();
-			} else {
-				JSch j = new JSch();
-				Session session = j.getSession(name, "helios.cs.ifmo.ru", 2222);
-				session.setPassword(pass);
-				session.setConfig("StrictHostKeyChecking", "no");
-				session.setConfig("PreferredAuthentications","publickey,keyboard-interactive,password");
-				session.connect();
-				Channel channel = session.getStreamForwarder("helios.cs.ifmo.ru", 18888);
-				channel.connect();
-				input = channel.getInputStream();
-				output = channel.getOutputStream();
-			}
-			oos = new ObjectOutputStream(output);
-			oos.flush();
-			ois = new ObjectInputStream(input);
-			
-			//channel.connect();
-			
-			return true;
-		} catch (JSchException e) {
-			return false;
-		}
+		Config config = new Config();
+
+		socket = new Socket(config.getHost(), config.getPort());
+		input = socket.getInputStream();
+		output = socket.getOutputStream();
+
+		oos = new ObjectOutputStream(output);
+		oos.flush();
+		ois = new ObjectInputStream(input);
+
+
+		return true;
 	}
 
 	public boolean checkConnection() {

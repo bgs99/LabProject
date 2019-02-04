@@ -1,3 +1,5 @@
+import bgs99c.shared.Config;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -15,14 +17,15 @@ public class Server implements Closeable{
 		loginManager = new DBManager();
 	}
 	public void init() {
+		int port = new Config().getPort();
 		try {
-			serverSocket = new ServerSocket(18888);
+			serverSocket = new ServerSocket(port);
 		} catch(Exception e) {
-			System.out.println("Can't start server at port 18888:");
+			System.out.println(String.format("Can't start server at port %d:", port));
 			System.out.println(e.getMessage());
 			System.exit(1);
 		}
-		System.out.println("Server is listening on port 18888");
+		System.out.println(String.format("Server is listening on port %d", port));
 	}
 	public void run() throws IOException {
 		while(true) {
