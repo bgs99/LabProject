@@ -19,15 +19,23 @@ public final class Session implements Closeable, Runnable{
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
 	
-	private DBManager lm;
+	private DBManager dbManager;
 	
 	private String name = null;
 	
 	private Game game = null;
 	
 	public Session(DBManager loginManager, Socket sock ) {
-		lm = loginManager;
+        dbManager = loginManager;
 		connectionSocket = sock;
+	}
+
+	public void init() throws IOException {
+		InputStream input = connectionSocket.getInputStream();
+		OutputStream output = connectionSocket.getOutputStream();
+		oos = new ObjectOutputStream(output);
+		oos.flush();
+		ois = new ObjectInputStream(input);
 	}
 	
 	public boolean login() throws IOException, SQLException {
@@ -48,7 +56,7 @@ public final class Session implements Closeable, Runnable{
 		oos.write(sessionSalt);
 		oos.flush();
 		String pass = ois.readUTF();
-		boolean success = true;//TODO fix it back//lm.checkPassword(name, pass, sessionSalt);
+		boolean success = true; //TODO: fix it back//lm.checkPassword(name, pass, sessionSalt);
 		oos.write(success? 0 : 1);
 		oos.flush();
 		this.name = name;
@@ -70,13 +78,7 @@ public final class Session implements Closeable, Runnable{
         Game.updatePlayer(fileName.substring(0, fileName.indexOf('.')));
 	}
 	
-	public void init() throws IOException {
-		InputStream input = connectionSocket.getInputStream();
-		OutputStream output = connectionSocket.getOutputStream();
-		oos = new ObjectOutputStream(output);
-		oos.flush();
-		ois = new ObjectInputStream(input);
-	}
+
 	
 	private void acceptFeedback() throws IOException {
 		System.out.println("*** " + ois.readUTF());
@@ -115,18 +117,18 @@ public final class Session implements Closeable, Runnable{
 	public void run() {
 		try {
 			while(!login()){
-
+				Thread.yield();
 			}
 
 			System.out.println("User " + name + " logged in");
-			UserStats[] users = lm.getUsers();
+			UserStats[] users = dbManager.getUsers();
 			game = new Game(users);
 			
 			while(true) {
 				Protocol action = Protocol.fromInt(ois.read());
 				switch(action) {
 					case STATS:
-						users = lm.getUsers();
+						users = dbManager.getUsers();
 						sendStats(users);
 						break;
 					case NONE:

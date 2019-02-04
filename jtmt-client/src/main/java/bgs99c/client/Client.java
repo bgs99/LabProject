@@ -26,6 +26,7 @@ public class Client implements Closeable {
 	Socket socket = null;
 	Lock lock = new ReentrantLock();
 	public String name;
+
 	@Override
 	public void close() throws IOException {
 		if(oos != null && ois != null ) {
@@ -35,6 +36,7 @@ public class Client implements Closeable {
 		if(socket != null)
 			socket.close();
 	}
+
 	public boolean init(String name, String pass) throws IOException {
 		InputStream input;
 		OutputStream output;
@@ -67,8 +69,9 @@ public class Client implements Closeable {
 			return false;
 		}
 	}
+
 	public boolean checkConnection() {
-		if(lock.tryLock()) {
+		if (lock.tryLock()) {
 		    try {
 		    	useProtocol(Protocol.STATUS);
 				oos.flush();
@@ -83,6 +86,7 @@ public class Client implements Closeable {
 		else 
 			return false;
 	}
+
 	public synchronized boolean login(String name, String pass) throws IOException {
 		oos.writeUTF(name);
 		oos.flush();
@@ -106,6 +110,7 @@ public class Client implements Closeable {
 		}
 		return succ == 0;
 	}
+
 	public UserStats[] getStats() throws IOException, ClassNotFoundException {
 		lock.lock();
 		try {
@@ -120,25 +125,41 @@ public class Client implements Closeable {
 			lock.unlock();
 		}
 	}
-	public void declareTournament() throws IOException {
+
+    @SuppressWarnings("unchecked")
+	public BattleInfo declareTournament() throws IOException, ClassNotFoundException {
 		lock.lock();
 		try {
 			useProtocol(Protocol.TOURNAMENT);
 			oos.flush();
+
+			// TODO: Not sure how exactly it should work, maybe change this
+            List<String> players = (List<String>)ois.readObject();
+            List<String> ranks = (List<String>)ois.readObject();
+            List<Record> records = (List<Record>) ois.readObject();
+            return new BattleInfo(players, ranks, records);
 		} finally {
 			lock.unlock();
 		}
 	}
-	public void declareBattle(String selectedPlayer) throws IOException {
+
+    @SuppressWarnings("unchecked")
+	public BattleInfo declareBattle(String selectedPlayer) throws IOException, ClassNotFoundException {
 		lock.lock();
 		try {
 			useProtocol(Protocol.BATTLE);
 			oos.writeUTF(selectedPlayer);
 			oos.flush();
+
+			List<String> players = (List<String>)ois.readObject();
+			List<String> ranks = (List<String>)ois.readObject();
+			List<Record> records = (List<Record>) ois.readObject();
+			return new BattleInfo(players, ranks, records);
 		} finally {
 			lock.unlock();
 		}
 	}
+
 	@SuppressWarnings("unchecked")
 	public List<String> getPlayers() throws IOException, ClassNotFoundException {
 		lock.lock();
@@ -148,6 +169,7 @@ public class Client implements Closeable {
 			lock.unlock();
 		}
 	}
+
 	@SuppressWarnings("unchecked")
 	public List<String> getRanks() throws IOException, ClassNotFoundException {
 		lock.lock();
@@ -157,6 +179,7 @@ public class Client implements Closeable {
 			lock.unlock();
 		}
 	}
+
 	@SuppressWarnings("unchecked")
 	public List<Record> getResults() throws IOException, ClassNotFoundException {
 		lock.lock();
@@ -166,6 +189,7 @@ public class Client implements Closeable {
 			lock.unlock();
 		}
 	}
+
 	public void sendFile(File file) throws IOException {
         lock.lock();
 		try {
@@ -183,6 +207,7 @@ public class Client implements Closeable {
 			lock.unlock();
 		} 
 	}
+
 	private void useProtocol(Protocol protocol) throws IOException {
 		oos.write(protocol.ordinal());
 		oos.flush();

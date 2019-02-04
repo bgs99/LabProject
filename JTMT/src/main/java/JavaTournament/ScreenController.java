@@ -113,20 +113,22 @@ public class ScreenController {
 	
 	private void startTournament(ActionEvent event){
         try {
-            client.declareTournament();
-        } catch (IOException e) {
+            BattleInfo battleInfo = client.declareTournament();
+            new BattleController(battleInfo, frame);
+        }
+        catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-        new BattleController(client, frame);
 	}
 	
 	private void startBattle(ActionEvent event) {
         try {
-            client.declareBattle(selectedPlayer);
-        } catch (IOException e) {
+            BattleInfo battleInfo = client.declareBattle(selectedPlayer);
+            new BattleController(battleInfo, frame);
+        }
+        catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-        new BattleController(client, frame);
 	}
 	
 }

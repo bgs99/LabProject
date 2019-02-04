@@ -31,7 +31,7 @@ import static java.awt.GridBagConstraints.WEST;
 
 public class BattleController {
 
-    private class MultiLabel extends JLabel{
+    private class MultiLabel extends JLabel {
         public MultiLabel() {
             super();
         }
@@ -45,8 +45,6 @@ public class BattleController {
         }
     }
 
-
-	private Client client;
 	private JFrame frame;
 	private LogId apid = null;
 	private Map<LogId, FighterStats> fightersA = new LinkedHashMap<>(), fightersB = new LinkedHashMap<>();
@@ -54,20 +52,15 @@ public class BattleController {
 	private int turn = -1;
 	private int battle = 0;
 	private List<Record> res;
-	public BattleController(Client client, JFrame frame) {
-	    this.client = client;
+
+	public BattleController(BattleInfo battleInfo, JFrame frame) {
 	    this.frame = frame;
 
         /*fightersA.clear();
         fightersB.clear();*/
-        try {
-            players = client.getPlayers();
-            ranks = client.getRanks();
-            res = client.getResults();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
+        players = battleInfo.getPlayers();
+        ranks = battleInfo.getRanks();
+        res = battleInfo.getResults();
         /*losersList.clear();
         losersList.addAll(losers);*/
 
@@ -145,6 +138,7 @@ public class BattleController {
 	private Image aImage, bImage;
 	private Button turnButton, battleButton;
     private List<String> losers = new ArrayList<>();
+
 	private void turn(ActionEvent event) {
 		turn++;
 		List<Log> logs = res.get(turn).logs;

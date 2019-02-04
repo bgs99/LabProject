@@ -2,6 +2,7 @@ import java.io.PrintStream;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import bgs99c.shared.Security;
 import bgs99c.shared.UserStats;
@@ -39,21 +40,31 @@ public class DBManager {
 			st.setInt(3, players.size()- i);
 		}
 	}
-	private String localCon = "jdbc:postgresql:studs";
+
+	//TODO: move these to separate properties file
+	private String localCon = "jdbc:postgresql:studs"; //"jdbc:postgresql://localhost/postgres"
 	private String remoteCon = "jdbc:postgresql://pg/studs";
+
 	public DBManager() throws SQLException{
 		PrintStream err = System.err;
 		try {
 			System.setErr(null);
+
+			// TODO: move these to separate properties file
+			//Properties properties = new Properties();
+			//properties.setProperty("user", "postgres");
+			//properties.setProperty("password", "12345");
+			//conn = DriverManager.getConnection(localCon, properties);
 			conn = DriverManager.getConnection(localCon);
 		} catch (SQLException e) {
+			System.out.println(e.getMessage());
 			System.out.println("Local DB not found, trying to connect to host pg...");
 			conn = DriverManager.getConnection(remoteCon, "s242322", "waw657");
 		} finally {
 			System.setErr(err);
 		}
-
 	}
+	
 	public boolean checkPassword(String name, String password, byte sessionSalt) throws SQLException {
 		Statement st = conn.createStatement();
 		ResultSet rs = st.executeQuery("SELECT password FROM logins WHERE name = '"+name + "'");
