@@ -48,6 +48,7 @@ public final class Session implements Closeable, Runnable{
 		} catch (Exception e) {
 			oos.write(1);
 			oos.flush();
+			System.out.println("Failed to get salt for such user.");
 			return false;
 		}
 		oos.write(0);
@@ -55,10 +56,16 @@ public final class Session implements Closeable, Runnable{
 		byte sessionSalt = Security.createSalt();
 		oos.write(sessionSalt);
 		oos.flush();
+		System.out.println("Sent salt.");
+
 		String pass = ois.readUTF();
+		System.out.println("Received salted hash: " + pass);
 		boolean success = dbManager.checkPassword(name, pass, sessionSalt);
+		System.out.println("Finished checking password");
 		oos.write(success? 0 : 1);
 		oos.flush();
+		System.out.println("Login result: " + success);
+
 		this.name = name;
 		return success;
 	}

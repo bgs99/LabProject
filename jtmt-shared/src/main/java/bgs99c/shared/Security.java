@@ -10,6 +10,7 @@ public class Security {
 	}
 	
 	public static String saltHashString(String input, byte salt) {
+		System.out.println("Got input to hashsalt: " + input);
 		return saltData(Parser.fromHexString(input), salt);
 	}
 	public static String saltData(byte[] data, byte salt) {

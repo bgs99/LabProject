@@ -53,7 +53,13 @@ public class User {
     }
 
     public boolean checkPassword(String password, byte sessionSalt){
-        return Security.saltHashString(this.password, sessionSalt).equals(password);
+        try {
+            return Security.saltHashString(this.password, sessionSalt).equals(password);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public byte getSalt() {

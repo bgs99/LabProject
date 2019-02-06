@@ -78,14 +78,15 @@ public class Client implements Closeable {
 		byte salt = (byte)ois.read();
 		byte sessionSalt = (byte)ois.read();
 		String hashedPass = Security.saltUTFString(pass, salt);
-		
-		System.out.print("1");
+		System.out.println("Generated hashed password");
 		
 		String saltedPass = Security.saltHashString(hashedPass, sessionSalt);
+		System.out.println("Generated salted hash");
 
-		System.out.print("2");
 		oos.writeUTF(saltedPass);
 		oos.flush();
+		System.out.println("Sent salted hash: " + saltedPass);
+
 		succ = ois.read();
 		if(succ == 0) {
 			System.out.println("Login successful");
@@ -138,36 +139,6 @@ public class Client implements Closeable {
 			List<String> ranks = (List<String>)ois.readObject();
 			List<Record> records = (List<Record>) ois.readObject();
 			return new BattleInfo(players, ranks, records);
-		} finally {
-			lock.unlock();
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<String> getPlayers() throws IOException, ClassNotFoundException {
-		lock.lock();
-		try {
-			return (List<String>)ois.readObject();
-		} finally {
-			lock.unlock();
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<String> getRanks() throws IOException, ClassNotFoundException {
-		lock.lock();
-		try {
-			return (List<String>)ois.readObject();
-		} finally {
-			lock.unlock();
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Record> getResults() throws IOException, ClassNotFoundException {
-		lock.lock();
-		try {
-			return (List<Record>) ois.readObject();
 		} finally {
 			lock.unlock();
 		}
