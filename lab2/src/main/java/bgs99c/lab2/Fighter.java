@@ -8,7 +8,7 @@ public abstract class Fighter extends FighterInfo{
     final static int LVLPOINTS = 5;
     private final static int MAXMOVES = 5;
     
-    public FighterStats getStats() {
+    public final FighterStats getStats() {
     	FighterStats ret = new FighterStats();
     	ret.accuracy = accuracy;
     	ret.defence = defence;
@@ -22,17 +22,17 @@ public abstract class Fighter extends FighterInfo{
     }
     
     /**
-     * Fighter's stats
+     * Fighter's base stats
      */
     public final static int HEALTH = 50, DEFENCE = 10, ACCURACY = 20, EVASION = 10, POWER = 5;
-    void reset(){
+    final void reset(){
         health = maxhealth;
     }
     /**
      * Adds new type to fighter if it's evolution level is enough
      * @param t New type
      */
-    public void addType(Types t){
+    public final void addType(Types t){
         if(typePoints <= 0){
             OutputLogger.log("Too many types for " + this);
             return;
@@ -52,7 +52,7 @@ public abstract class Fighter extends FighterInfo{
     /**
      * Returns moves that fighter could use
      */
-    public Move[] getMoves(){
+    public final Move[] getMoves(){
         return moves.toArray(new Move[0]);
     }
 
@@ -60,7 +60,7 @@ public abstract class Fighter extends FighterInfo{
      * Adds moves if there's not too many already (max = 5)
      * @param m New move
      */
-    public void addMove(Move m){
+    public final void addMove(Move m){
         if(movesLeft <=0){
             OutputLogger.log(this.getClass().getSimpleName() + " cannot learn so many moves.");
             return;
@@ -68,12 +68,12 @@ public abstract class Fighter extends FighterInfo{
         movesLeft--;
         moves.add(m);
     }
-    Log applyPeriodicDamages(Player you){
+    final Log applyPeriodicDamages(Player you){
         List<Integer> pd = periodicDamages;
         int sum = 0;
         for(int i = 0; i < pd.size();i++){
             int damage = pd.get(i);
-            OutputLogger.log(this + " is losing " + damage + " hp because of periodic damage.");
+            OutputLogger.log(this + " is losing " + damage + " HP because of periodic damage.");
             health -= damage;
             sum+=damage;
             pd.set(i, damage-1);
@@ -84,14 +84,14 @@ public abstract class Fighter extends FighterInfo{
         }
         return new PeriodicDamageLog(this, you, sum);
     }
-    void addPeriodicDamage(int value){
+    final void addPeriodicDamage(int value){
         if(value<0){
             return;
         }
         OutputLogger.log("It's " + value + " points of periodic damage!");
         periodicDamages.add(value);
     }
-    int applyDamage(int amount){
+    final int applyDamage(int amount){
         if(amount <= defence){
             OutputLogger.log("This attack is too weak");
             return 0;
@@ -100,7 +100,7 @@ public abstract class Fighter extends FighterInfo{
         health -= amount - defence;
         return amount-defence;
     }
-    void heal(int amount){
+    final void heal(int amount){
         int sh = health;
         health += amount;
         health = health > maxhealth ? maxhealth : health;
@@ -110,24 +110,25 @@ public abstract class Fighter extends FighterInfo{
     /**
      * Returns accuracy considering debuff
      */
-    public int getAccuracy(){
+    public final int getAccuracy(){
         return accuracy - getDebuff();
     }
 
     /**
      * Returns evasion considering debuff
      */
-    public int getEvasion() {
+    @Override
+    public final int getEvasion() {
         return evasion - getDebuff();
     }
-    public int getDefence() {
+    public final int getDefence() {
     	return defence - getDebuff();
     }
 
     /**
      * Returns power considering debuff
      */
-    public int getPower() {
+    public final int getPower() {
         return power - getDebuff();
     }
 
@@ -144,9 +145,9 @@ public abstract class Fighter extends FighterInfo{
      * @param amount Amount the ability will be changed
      * @param stat Stat that will change
      */
-    public void changeAbility(int amount, Stats stat){
+    public final void increaseStat(int amount, Stats stat){
         if(talentPoints < amount){
-            OutputLogger.log(this.getClass().getSimpleName() + " is trying to use steroids. With no luck.");
+            OutputLogger.log(this.getClass().getSimpleName() + " has exceeded it's talent points limits.");
             return;
         }
         talentPoints -= amount;
@@ -173,10 +174,14 @@ public abstract class Fighter extends FighterInfo{
     /**
      * Returns current health considering damage in battle
      */
-    public int getHealth(){
+    public final int getHealth(){
         return health;
     }
-    void addTalentPoints(){
+    @Override
+    public final double getHealthBar() {
+        return health*1.0/maxhealth;
+    }
+    final void addTalentPoints(){
         talentPoints += LVLPOINTS;
     }
 }

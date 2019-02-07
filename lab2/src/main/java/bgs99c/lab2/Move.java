@@ -10,20 +10,20 @@ public abstract class Move implements Action{
     /**
      * Returns amount of ability points left
      */
-    public int pointsLeft(){
+    public final int pointsLeft(){
         return abilityPoints;
     }
-    void spendPoints(int amount){
+    final void spendPoints(int amount){
         abilityPoints -= amount;
     }
-    boolean checkPoints(int amount){
-        if(pointsLeft()<amount){
-            OutputLogger.log(this.getClass().getSimpleName() + "is too powerful");
+    final boolean checkPoints(int amount){
+        if(pointsLeft() < amount){
+            OutputLogger.log(this.getClass().getSimpleName() + " is too powerful");
             return false;
         }
         return true;
     }
-    final static double checkEffect(Types ability, Types receiver){
+    static double checkEffect(Types ability, Types receiver){
         if(ability.goodAgainst(receiver))
             return 2;
         if(ability.badAgainst(receiver))

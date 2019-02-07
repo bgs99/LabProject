@@ -22,12 +22,12 @@ public abstract class Attack extends Move{
      * Changes accuracy and substracts/adds points if amount is positive/negative
      * @param amount Amount the accuracy will change. Positive to increase, negative to decrease
      */
-    protected void changeAccuracy(int amount){
+    protected final void changeAccuracy(int amount){
         if(checkPoints(amount)){
             accuracy+=amount;
         }
     }
-    private List<Effect> effects = new ArrayList<Effect>();
+    private List<Effect> effects = new ArrayList<>();
 
     /**
      * Adds effect to attack if there's enough point for that
@@ -70,7 +70,6 @@ public abstract class Attack extends Move{
                 default:
                     return 0;
             }
-
         }
     }
 

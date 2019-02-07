@@ -10,9 +10,9 @@ public abstract class FighterInfo {
 	}
     FighterInfo(String n){
         name = n;
-        types = new ArrayList<Types>();
+        types = new ArrayList<>();
         Class<?> cc = this.getClass();
-        for(;cc.getName() != "bgs99c.lab2.Fighter";evolutionLevel++) {
+        for(; !cc.getName().equals("bgs99c.lab2.Fighter"); evolutionLevel++) {
             cc = cc.getSuperclass();
         }
         typePoints = evolutionLevel;
@@ -25,7 +25,7 @@ public abstract class FighterInfo {
      * Returns this fighter's types.
      * @return Returns this fighter's types. Can be empty.
      */
-    public Types[] getTypes(){
+    public final Types[] getTypes(){
         return types.toArray(new Types[0]);
     }
 
@@ -33,7 +33,7 @@ public abstract class FighterInfo {
      * Evolution level is the depth of inheritance from Fighter class
      * @return Evolution level
      */
-    public int getEvolutionLevel(){
+    public final int getEvolutionLevel(){
         return evolutionLevel;
     }
     protected List<Types> types;
@@ -41,33 +41,33 @@ public abstract class FighterInfo {
 
     
     abstract Log applyPeriodicDamages(Player you);
-    boolean applyStuns() {
+    final boolean applyStuns() {
         if(stun <= 0) {
             return false;
         }
         stun--;
         return true;
     }
-    int getDebuff(){
+    final int getDebuff(){
         return debuff;
     }
     private int stun = 0;
     private int debuff = 0;
-    void addStun(int time){
+    final void addStun(int time){
         stun = (stun > time) ? stun : time;
     }
     abstract void addPeriodicDamage(int value);
-    public String toString(){
+    public final String toString(){
         return this.getClass().getSimpleName() + " " + name;
     }
     /**
-     * Returns current health in a battle
+     * Returns current health percent in a battle
      * @return current health
      */
-    public abstract int getHealth();
+    public abstract double getHealthBar();
     abstract int applyDamage(int amount);
-    void lowerStats(int amount){
-        debuff = (debuff > amount) ? debuff : amount;
-    };
     abstract int getEvasion();
+    final void lowerStats(int amount){
+        debuff = (debuff > amount) ? debuff : amount;
+    }
 }
