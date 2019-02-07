@@ -5,39 +5,42 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Fighter extends FighterInfo{
-public FighterStats getStats() {
+public final FighterStats getStats() {
 throw new UnsupportedOperationException();
 }
 public final static int HEALTH = 50, DEFENCE = 10, ACCURACY = 20, EVASION = 10, POWER = 5;
-public void addType(Types t){
+public final void addType(Types t){
 throw new UnsupportedOperationException();
 }
 public String image = "";
-public Move[] getMoves(){
+public final Move[] getMoves(){
 throw new UnsupportedOperationException();
 }
-public void addMove(Move m){
+public final void addMove(Move m){
 throw new UnsupportedOperationException();
 }
-public int getAccuracy(){
+public final int getAccuracy(){
 throw new UnsupportedOperationException();
 }
-public int getEvasion() {
+public final int getEvasion() {
 throw new UnsupportedOperationException();
 }
-public int getDefence() {
+public final int getDefence() {
 throw new UnsupportedOperationException();
 }
-public int getPower() {
+public final int getPower() {
 throw new UnsupportedOperationException();
 }
 public Fighter(String n){
 throw new UnsupportedOperationException();
 }
-public void changeAbility(int amount, Stats stat){
+public final void increaseStat(int amount, Stats stat){
 throw new UnsupportedOperationException();
 }
-public int getHealth(){
+public final int getHealth(){
+throw new UnsupportedOperationException();
+}
+public final double getHealthBar() {
 throw new UnsupportedOperationException();
 }
 }

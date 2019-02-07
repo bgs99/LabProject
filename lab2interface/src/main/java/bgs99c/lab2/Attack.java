@@ -12,7 +12,7 @@ public final static int DEFAULT_ACCURACY = 40;
 public Attack(Types t){
 throw new UnsupportedOperationException();
 }
-protected void changeAccuracy(int amount){
+protected final void changeAccuracy(int amount){
 throw new UnsupportedOperationException();
 }
 protected final void addEffect(Effect e){
@@ -45,7 +45,6 @@ public final class Effect{
                 default:
                     return 0;
             }
-
         }
     }
 

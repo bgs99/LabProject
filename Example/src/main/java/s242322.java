@@ -6,7 +6,7 @@ class SimpleStrategy extends Strategy{
         return getBattle().currentFighter().getMoves()[0];
     }
     public void levelUp(Fighter f, int points) {
-        f.changeAbility(points, Stats.HEALTH);
+        f.increaseStat(points, Stats.HEALTH);
         
     }
     public Fighter selectFighter(int left) {
@@ -67,10 +67,10 @@ class Soldier extends Fighter{
         addType(Types.MELEE);
         id++;
         addMove(new Punch());
-        changeAbility(5, Stats.DEFENCE);
-        changeAbility(5, Stats.POWER);
-        changeAbility(5, Stats.HEALTH);
-        changeAbility(5, Stats.EVASION);
+        increaseStat(5, Stats.DEFENCE);
+        increaseStat(5, Stats.POWER);
+        increaseStat(5, Stats.HEALTH);
+        increaseStat(5, Stats.EVASION);
     }
 }
 class Punch extends Attack {

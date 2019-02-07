@@ -8,16 +8,16 @@ public abstract class FighterInfo {
 public final int hashCode() {
 throw new UnsupportedOperationException();
 }
-public Types[] getTypes(){
+public final Types[] getTypes(){
 throw new UnsupportedOperationException();
 }
-public int getEvolutionLevel(){
+public final int getEvolutionLevel(){
 throw new UnsupportedOperationException();
 }
 protected List<Types> types;
 protected int typePoints = 0;
-public String toString(){
+public final String toString(){
 throw new UnsupportedOperationException();
 }
-public abstract int getHealth();
+public abstract double getHealthBar();
 }
