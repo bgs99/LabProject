@@ -12,7 +12,7 @@ public class OutputLogger {
 		cur = new Record();
 	}
 	public static void log(String a) {
-		cur.msgs.append(a + '\n');
+		cur.msgs.append(a).append('\n');
 	}
 	public static List<Record> getLogs() {
 		if(cur.msgs.length() > 0)

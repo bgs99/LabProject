@@ -75,7 +75,7 @@ public final class Battle {
                 return true;
             }, teamA.player);
             return null;
-        } catch (Exception e) {
+        } catch (Exception | StackOverflowError | OutOfMemoryError e) {
             return this.fail;
         }
     }
@@ -102,7 +102,7 @@ public final class Battle {
                 turn.run();
                 current = turn.get(1, TimeUnit.SECONDS);
             }
-            catch(Exception e){
+            catch(Exception | StackOverflowError| OutOfMemoryError e){
                 e.printStackTrace();
                 OutputLogger.log("Exception in async");
                 winner = opponentInfo().player;

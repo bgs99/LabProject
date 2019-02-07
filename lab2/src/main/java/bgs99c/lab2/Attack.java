@@ -114,7 +114,7 @@ public abstract class Attack extends Move{
         }
         return true;
     }
-    public Log apply(Battle b){
+    public final Log apply(Battle b){
         if(!Arrays.asList(b.currentFighter().getMoves()).contains(this)){
             OutputLogger.log(b.currentFighter() + " doesn't know how to use " + this);
             return Log.Fail(b.currentFighter(),b.getCurrentPlayer());
