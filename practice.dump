@@ -1,27 +1,3 @@
---
--- PostgreSQL database dump
---
-
--- Dumped from database version 11.1
--- Dumped by pg_dump version 11.1
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET client_min_messages = warning;
-SET row_security = off;
-
-SET default_tablespace = '';
-
-SET default_with_oids = false;
-
---
--- Name: logins; Type: TABLE; Schema: public; Owner: bgs99c
---
 
 CREATE TABLE public.logins (
     id integer NOT NULL,
@@ -29,13 +5,6 @@ CREATE TABLE public.logins (
     salt smallint,
     password text
 );
-
-
-ALTER TABLE public.logins OWNER TO bgs99c;
-
---
--- Name: logins_id_seq; Type: SEQUENCE; Schema: public; Owner: bgs99c
---
 
 CREATE SEQUENCE public.logins_id_seq
     AS integer
@@ -45,34 +14,36 @@ CREATE SEQUENCE public.logins_id_seq
     NO MAXVALUE
     CACHE 1;
 
-
-ALTER TABLE public.logins_id_seq OWNER TO bgs99c;
-
---
--- Name: logins_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: bgs99c
---
-
 ALTER SEQUENCE public.logins_id_seq OWNED BY public.logins.id;
 
-
---
--- Name: tournaments; Type: TABLE; Schema: public; Owner: bgs99c
---
 
 CREATE TABLE public.tournaments (
     player integer,
     "position" integer,
-    date timestamp without time zone
+    date timestamp without time zone,
+    id integer NOT NULL
 );
 
+CREATE SEQUENCE public.tournaments_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
-ALTER TABLE public.tournaments OWNER TO bgs99c;
 
---
--- Name: logins id; Type: DEFAULT; Schema: public; Owner: bgs99c
---
+ALTER SEQUENCE public.tournaments_id_seq OWNED BY public.tournaments.id;
+
 
 ALTER TABLE ONLY public.logins ALTER COLUMN id SET DEFAULT nextval('public.logins_id_seq'::regclass);
+
+
+--
+-- Name: tournaments id; Type: DEFAULT; Schema: public; Owner: bgs99c
+--
+
+ALTER TABLE ONLY public.tournaments ALTER COLUMN id SET DEFAULT nextval('public.tournaments_id_seq'::regclass);
 
 
 --
@@ -80,8 +51,8 @@ ALTER TABLE ONLY public.logins ALTER COLUMN id SET DEFAULT nextval('public.login
 --
 
 COPY public.logins (id, name, salt, password) FROM stdin;
-0	s242322	0	aaa
-1	Player1	0	DEADBEEF
+4	s242322	-72	3D2C8A129939D7DB33A235CCF93F0DEE800691D48732178CEB258C9E91450B25
+1	Player4	0	DEADBEEF
 \.
 
 
@@ -89,7 +60,7 @@ COPY public.logins (id, name, salt, password) FROM stdin;
 -- Data for Name: tournaments; Type: TABLE DATA; Schema: public; Owner: bgs99c
 --
 
-COPY public.tournaments (player, "position", date) FROM stdin;
+COPY public.tournaments (player, "position", date, id) FROM stdin;
 \.
 
 
@@ -97,7 +68,14 @@ COPY public.tournaments (player, "position", date) FROM stdin;
 -- Name: logins_id_seq; Type: SEQUENCE SET; Schema: public; Owner: bgs99c
 --
 
-SELECT pg_catalog.setval('public.logins_id_seq', 1, false);
+SELECT pg_catalog.setval('public.logins_id_seq', 4, true);
+
+
+--
+-- Name: tournaments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: bgs99c
+--
+
+SELECT pg_catalog.setval('public.tournaments_id_seq', 1, false);
 
 
 --
@@ -106,6 +84,22 @@ SELECT pg_catalog.setval('public.logins_id_seq', 1, false);
 
 ALTER TABLE ONLY public.logins
     ADD CONSTRAINT logins_pkey1 PRIMARY KEY (id);
+
+
+--
+-- Name: tournaments tournaments_pk; Type: CONSTRAINT; Schema: public; Owner: bgs99c
+--
+
+ALTER TABLE ONLY public.tournaments
+    ADD CONSTRAINT tournaments_pk PRIMARY KEY (id);
+
+
+--
+-- Name: tournaments fkgxwyy9sjivs89kbluk5qy4gss; Type: FK CONSTRAINT; Schema: public; Owner: bgs99c
+--
+
+ALTER TABLE ONLY public.tournaments
+    ADD CONSTRAINT fkgxwyy9sjivs89kbluk5qy4gss FOREIGN KEY (player) REFERENCES public.logins(id);
 
 
 --
