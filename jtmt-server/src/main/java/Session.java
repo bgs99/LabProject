@@ -85,8 +85,6 @@ public final class Session implements Closeable, Runnable{
         Game.updatePlayer(fileName.substring(0, fileName.indexOf('.')));
 	}
 	
-
-	
 	private void acceptFeedback() throws IOException {
 		System.out.println("*** " + ois.readUTF());
 		System.out.println("*** " + name);
@@ -107,6 +105,7 @@ public final class Session implements Closeable, Runnable{
 		oos.flush();
 		Game.clearLogs();
 	}
+
 	private synchronized void makeBattle(String opponent) throws IOException, SQLException {
 		String winner = game.Battle(this.name, opponent);
 		List<String> ps = new ArrayList<String>();
@@ -121,6 +120,7 @@ public final class Session implements Closeable, Runnable{
 		oos.flush();
 		Game.clearLogs();
 	}
+
 	@Override
 	public void run() {
 		try {
@@ -132,9 +132,9 @@ public final class Session implements Closeable, Runnable{
 			UserStats[] users = dbManager.getUsers();
 			game = new Game(users);
 			
-			while(true) {
+			while (true) {
 				Protocol action = Protocol.fromInt(ois.read());
-				switch(action) {
+				switch (action) {
 					case STATS:
 						users = dbManager.getUsers();
 						sendStats(users);
@@ -157,11 +157,14 @@ public final class Session implements Closeable, Runnable{
 					case STATUS:
 						oos.write(0);
 						oos.flush();
+						break;
 					default:
+						System.err.println("Unknown protocol action: " + action);
 						break;
 				}
 			}
 		} catch (IOException | SQLException e) {
+		    e.printStackTrace();
 			Thread.currentThread().interrupt();
 		}
 	}

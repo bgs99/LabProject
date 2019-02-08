@@ -1,5 +1,6 @@
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -116,7 +117,9 @@ public class Loader {
 	static {
 		Properties config = new Properties();
 		try {
-			config.load(Loader.class.getResourceAsStream("/storage.properties"));
+			InputStream r = Loader.class.getResourceAsStream("/storage.properties");
+			config.load(r);
+			r.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
