@@ -1,10 +1,21 @@
 
+
+--
+-- Name: logins; Type: TABLE; Schema: public; Owner: bgs99c
+--
+
 CREATE TABLE public.logins (
     id integer NOT NULL,
     name text,
     salt smallint,
     password text
 );
+
+
+
+--
+-- Name: logins_id_seq; Type: SEQUENCE; Schema: public; Owner: bgs99c
+--
 
 CREATE SEQUENCE public.logins_id_seq
     AS integer
@@ -14,8 +25,18 @@ CREATE SEQUENCE public.logins_id_seq
     NO MAXVALUE
     CACHE 1;
 
+
+
+--
+-- Name: logins_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: bgs99c
+--
+
 ALTER SEQUENCE public.logins_id_seq OWNED BY public.logins.id;
 
+
+--
+-- Name: tournaments; Type: TABLE; Schema: public; Owner: bgs99c
+--
 
 CREATE TABLE public.tournaments (
     player integer,
@@ -23,6 +44,12 @@ CREATE TABLE public.tournaments (
     date timestamp without time zone,
     id integer NOT NULL
 );
+
+
+
+--
+-- Name: tournaments_id_seq; Type: SEQUENCE; Schema: public; Owner: bgs99c
+--
 
 CREATE SEQUENCE public.tournaments_id_seq
     AS integer
@@ -33,8 +60,17 @@ CREATE SEQUENCE public.tournaments_id_seq
     CACHE 1;
 
 
+
+--
+-- Name: tournaments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: bgs99c
+--
+
 ALTER SEQUENCE public.tournaments_id_seq OWNED BY public.tournaments.id;
 
+
+--
+-- Name: logins id; Type: DEFAULT; Schema: public; Owner: bgs99c
+--
 
 ALTER TABLE ONLY public.logins ALTER COLUMN id SET DEFAULT nextval('public.logins_id_seq'::regclass);
 
