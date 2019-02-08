@@ -41,6 +41,8 @@ public class Client implements Closeable {
 		InputStream input;
 		OutputStream output;
 
+		System.out.println("Connecting to server with host " + Config.getHost()
+                + " and port " + Config.getPort());
 		socket = new Socket(Config.getHost(), Config.getPort());
 		input = socket.getInputStream();
 		output = socket.getOutputStream();
@@ -48,7 +50,7 @@ public class Client implements Closeable {
 		oos = new ObjectOutputStream(output);
 		oos.flush();
 		ois = new ObjectInputStream(input);
-
+		System.out.println("Connected");
 
 		return true;
 	}
@@ -73,19 +75,24 @@ public class Client implements Closeable {
 	public synchronized boolean login(String name, String pass) throws IOException {
 		oos.writeUTF(name);
 		oos.flush();
+		System.out.println("Sent name");
 		int succ = ois.read();
-		if(succ != 0) return false;
+		if (succ != 0) {
+		    System.out.println("Received code: " + succ + ", disconnecting.");
+            return false;
+        }
 		byte salt = (byte)ois.read();
 		byte sessionSalt = (byte)ois.read();
 		String hashedPass = Security.saltUTFString(pass, salt);
-		
-		System.out.print("1");
+		System.out.println("Generated hashed password");
 		
 		String saltedPass = Security.saltHashString(hashedPass, sessionSalt);
+		System.out.println("Generated salted hash");
 
-		System.out.print("2");
 		oos.writeUTF(saltedPass);
 		oos.flush();
+		System.out.println("Sent salted hash: " + saltedPass);
+
 		succ = ois.read();
 		if(succ == 0) {
 			System.out.println("Login successful");
@@ -138,36 +145,6 @@ public class Client implements Closeable {
 			List<String> ranks = (List<String>)ois.readObject();
 			List<Record> records = (List<Record>) ois.readObject();
 			return new BattleInfo(players, ranks, records);
-		} finally {
-			lock.unlock();
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<String> getPlayers() throws IOException, ClassNotFoundException {
-		lock.lock();
-		try {
-			return (List<String>)ois.readObject();
-		} finally {
-			lock.unlock();
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<String> getRanks() throws IOException, ClassNotFoundException {
-		lock.lock();
-		try {
-			return (List<String>)ois.readObject();
-		} finally {
-			lock.unlock();
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Record> getResults() throws IOException, ClassNotFoundException {
-		lock.lock();
-		try {
-			return (List<Record>) ois.readObject();
 		} finally {
 			lock.unlock();
 		}

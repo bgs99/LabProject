@@ -101,6 +101,7 @@ public class MainController {
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Connection failed");
+            e.printStackTrace();
         } finally {
             Arrays.fill(passwordArray, '0');
         }

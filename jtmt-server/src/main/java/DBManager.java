@@ -50,8 +50,10 @@ class DBManager {
 
 	boolean checkPassword(String name, String password, byte sessionSalt) {
 		User u = getUserByName(name);
+		System.out.println("Got user from DB.");
         if(u == null)
             return false;
+        System.out.println("User is not null.");
 
         return u.checkPassword(password, sessionSalt);
 	}
