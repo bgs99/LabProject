@@ -52,19 +52,16 @@ class Player2 extends Player{
 class SuperSoldier extends Soldier{
     public SuperSoldier(){
         super();
-        addType(Types.RANGED);
+        addType(Types.FIRE);
     }
 }
 
 class Soldier extends Fighter{
     static int id = 0;
-    public Types newType(){
-        return Types.MELEE;
-    }
     public Soldier() {
         super("Soldat" + id);
         image = "http://www.mcmbuzz.com/wp-content/uploads/2014/07/025Pikachu_OS_anime_4.png";
-        addType(Types.MELEE);
+        addType(Types.ELECTRIC);
         id++;
         addMove(new Punch());
         increaseStat(5, Stats.DEFENCE);
@@ -75,7 +72,7 @@ class Soldier extends Fighter{
 }
 class Punch extends Attack {
     public Punch(){
-        super(Types.MELEE);
+        super(Types.FIGHTING);
         addEffect(new Effect(EffectType.DAMAGE, Move.ABLPOINTS));
     }
     public String description(Fighter f, FighterInfo t){
