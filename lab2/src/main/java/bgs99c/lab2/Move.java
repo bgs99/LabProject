@@ -24,10 +24,6 @@ public abstract class Move implements Action{
         return true;
     }
     static double checkEffect(Types ability, Types receiver){
-        if(ability.goodAgainst(receiver))
-            return 2;
-        if(ability.badAgainst(receiver))
-            return 0.5;
-        return 1;
+        return ability.getEfficiency(receiver);
     }
 }

@@ -1,39 +1,44 @@
 package bgs99c.lab2.shared;
 
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.util.Scanner;
 
 /**
- * Types of fighters
+ * Types of Pokemon
  */
 public enum Types {
-    /**
-     * Good against cavalry, weak against ranged
-     */
-    MELEE(0),
-    /**
-     * Good against melee, weak against cavalry
-     */
-    RANGED(1),
-    /**
-     * Good against ranged, weak against melee
-     */
-    CAVALRY(2);
-    private final int good;
-    private Types(int v){
-        good = v;
-    }
-    public boolean goodAgainst(Types b){
-        switch (good){
-            case 0:
-                return b == Types.CAVALRY;
-            case 1:
-                return b == Types.MELEE;
-            case 2:
-                return b == Types.RANGED;
+    NORMAL, FIRE, WATER, ELECTRIC, GRASS, ICE, FIGHTING, POISON, GROUND, FLYING, PSYCHIC, BUG, ROCK,
+    GHOST, DRAGON, DARK, STEEL, FAIRY;
+
+    private static double[][] chart = new double[Types.values().length][Types.values().length];
+
+    static {
+        Scanner br = new Scanner(Types.class.getResourceAsStream("/type_chart"));
+        for (int i = 0; i < chart.length; i++) {
+            String line = br.nextLine();
+            for(int j = 0; j < chart.length; j++) {
+                switch (line.charAt(j)){
+                    case '+':
+                        chart[i][j] = 2;
+                        break;
+                    case '-':
+                        chart[i][j] = 0.5;
+                        break;
+                    case '0':
+                        chart[i][j] = 0;
+                    default:
+                        chart[i][j] = 1;
+                }
+            }
         }
-        return false;
     }
-    public boolean badAgainst(Types b){
-        return b.goodAgainst(this);
+
+    public double getEfficiency(Types b){
+        int i = this.ordinal();
+        int j = b.ordinal();
+        return chart[i][j];
     }
 }
