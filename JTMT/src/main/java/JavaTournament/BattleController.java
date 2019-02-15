@@ -18,6 +18,7 @@ import bgs99c.lab2.PeriodicDamageLog;
 import bgs99c.lab2.Record;
 import bgs99c.lab2.ReplacementLog;
 import bgs99c.lab2.TeamLog;
+import bgs99c.lab2.shared.AttackResult;
 import bgs99c.lab2.shared.FighterStats;
 import bgs99c.lab2.shared.LogId;
 
@@ -179,12 +180,19 @@ public class BattleController {
 					break;
 				case ATTACK:
 					AttackLog al = (AttackLog)l;
-					if(al.getResult().getDamage() == 0)
-						break;
-					oteam.get(al.getSubject()).health -= al.getResult().getDamage();
-					
-					damageAnimation(al.getResult().getDamage(), l.getPlayer().equals(apid) ? bDamage : aDamage);
-					updateFighters(oteam);
+					AttackResult ar = al.getResult();
+
+					oteam.get(al.getSubject()).health -= ar.damage;
+					team.get(al.getUser()).health += ar.heal;
+
+					if (ar.damage > 0) {
+						damageAnimation(al.getResult().damage, l.getPlayer().equals(apid) ? bDamage : aDamage);
+						updateFighters(oteam);
+					}
+					if (ar.heal > 0) {
+						//TODO: heal animation
+						updateFighters(team);
+					}
 					break;
 				case DEATH:
 					DeathLog dl = (DeathLog)l;

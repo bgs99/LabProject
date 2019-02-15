@@ -100,11 +100,12 @@ public abstract class Fighter extends FighterInfo{
         health -= amount - defence;
         return amount-defence;
     }
-    final void heal(int amount){
-        int sh = health;
+    final int heal(int amount){
+        int previousHealth = health;
         health += amount;
         health = health > maxhealth ? maxhealth : health;
-        OutputLogger.log(this + "is healed for " + (health - sh) + " hp.");
+        OutputLogger.log(this + "is healed for " + (health - previousHealth) + " HP.");
+        return health - previousHealth;
     }
 
     /**

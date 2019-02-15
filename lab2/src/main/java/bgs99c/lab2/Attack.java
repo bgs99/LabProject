@@ -24,6 +24,7 @@ public abstract class Attack extends Move{
      */
     protected final void changeAccuracy(int amount){
         if(checkPoints(amount)){
+            spendPoints(amount);
             accuracy+=amount;
         }
     }
@@ -56,25 +57,12 @@ public abstract class Attack extends Move{
         EffectType type;
         int value;
         final int cost(){
-            switch (type){
-                case STUN:
-                    return 10 * value;
-                case LEECH:
-                    return 4 * value;
-                case STATS:
-                    return 12 * value;
-                case PERIODIC:
-                    return 5 * value;
-                case DAMAGE:
-                    return value;
-                default:
-                    return 0;
-            }
+            return type.price*value;
         }
     }
 
     /**
-     * Description wich will be displayed when attack is used
+     * Description to be displayed when attack is used
      * @param f User of attack
      * @param d Target of attack
      */
@@ -87,23 +75,38 @@ public abstract class Attack extends Move{
         /**
          * Applies raw damage
          */
-        DAMAGE,
+        DAMAGE(1, true),
         /**
          * Adds periodic damage that gradually wears off
          */
-        PERIODIC,
+        PERIODIC(5, true),
         /**
          * Damages target and heals user for a part of that damage
          */
-        LEECH,
+        LEECH(6, true),
         /**
          * Stuns target
          */
-        STUN,
+        STUN(10, true),
+        /**
+         * Heals target
+         */
+        HEAL(4, false),
         /**
          * Adds debuff to target's stats
          */
-        STATS
+        STATS_DOWN(12, true),
+        /**
+         * Adds buff to your own stats
+         */
+        STATS_UP(12, false);
+
+        int price;
+        boolean negative;
+        EffectType(int price, boolean negative) {
+            this.price = price;
+            this.negative = negative;
+        }
     }
     private boolean rollDice(Fighter attack, FighterInfo defence){
         Random r = new Random();
@@ -115,43 +118,97 @@ public abstract class Attack extends Move{
         return true;
     }
     public final Log apply(Battle b){
-        if(!Arrays.asList(b.currentFighter().getMoves()).contains(this)){
+        if(! Arrays.asList(b.currentFighter().getMoves()).contains(this)) {
             OutputLogger.log(b.currentFighter() + " doesn't know how to use " + this);
             return Log.Fail(b.currentFighter(),b.getCurrentPlayer());
         }
+
         OutputLogger.log(description(b.currentFighter(), b.currentOpponent()));
+
         if(!rollDice(b.currentFighter(), b.currentOpponent())){
             return Log.Fail(b.currentFighter(),b.getCurrentPlayer());
         }
-        int d = 0, s = 0, l = 0, n = 0, p = 0;
+
+        int damageResult    = 0;
+        int debuffResult    = 0;
+        int stunResult      = 0;
+        int periodicResult  = 0;
+        int healResult      = 0;
+        int buffResult      = 0;
+
         for(Effect e : effects){
+
             double valueK = 1;
-            for(Types t : b.currentOpponent().getTypes())
+
+            FighterInfo target = e.type.negative ? b.currentOpponent() : b.currentFighter();
+
+            for(Types t : target.getTypes())
                 valueK *= checkEffect(type, t);
-            int value = (int)(e.value*valueK);
+
+            if(valueK >=2 ) {
+                OutputLogger.log("It's super effective!");
+            } else if(valueK <= 0.5) {
+                OutputLogger.log("It's not very effective...");
+            }
+
+            int value = (int) (e.value * valueK);
+
             switch (e.type){
+
+                case HEAL:
+                    healResult += b.currentFighter()
+                            .heal(value);
+                    break;
+
                 case DAMAGE:
-                    d += b.currentOpponent().applyDamage(value + b.currentFighter().getPower());
+                    damageResult += b.currentOpponent()
+                            .applyDamage(value + b.currentFighter().getPower());
                     break;
-                case STATS:
-                    s+=value;
-                    b.currentOpponent().lowerStats(value);
+
+                case STATS_DOWN:
+                    debuffResult = b.currentOpponent()
+                            .lowerStats(value);
                     break;
+
                 case LEECH:
-                    int dmg = b.currentOpponent().applyDamage(value);
-                    b.currentFighter().heal(dmg);
-                    l+=dmg;
+                    int dmg = b.currentOpponent()
+                            .applyDamage(value);
+                    healResult += b.currentFighter()
+                            .heal(dmg);
+                    damageResult += dmg;
                     break;
+
                 case STUN:
-                    b.currentOpponent().addStun(value);
-                    n+=value;
+                    b.currentOpponent()
+                            .addStun(value);
+                    stunResult+=value;
                     break;
+
                 case PERIODIC:
-                    b.currentOpponent().addPeriodicDamage(value);
-                    p += value;
+                    b.currentOpponent()
+                            .addPeriodicDamage(value);
+                    periodicResult += value;
                     break;
+
+                case STATS_UP:
+                    buffResult = b.currentFighter()
+                            .increaseStats(value);
+                    break;
+
             }
         }
-        return new AttackLog(b.currentFighter(),new AttackResult(d,s,l,n,p), b.currentOpponent(),b.getCurrentPlayer());
+        return new AttackLog(
+                b.currentFighter(),
+                new AttackResult(
+                        damageResult,
+                        debuffResult,
+                        stunResult,
+                        periodicResult,
+                        healResult,
+                        buffResult
+                ),
+                b.currentOpponent(),
+                b.getCurrentPlayer()
+        );
     }
 }

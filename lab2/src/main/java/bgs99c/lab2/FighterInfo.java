@@ -49,10 +49,11 @@ public abstract class FighterInfo {
         return true;
     }
     final int getDebuff(){
-        return debuff;
+        return debuff - buff;
     }
     private int stun = 0;
     private int debuff = 0;
+    private int buff = 0;
     final void addStun(int time){
         stun = (stun > time) ? stun : time;
     }
@@ -67,7 +68,13 @@ public abstract class FighterInfo {
     public abstract double getHealthBar();
     abstract int applyDamage(int amount);
     abstract int getEvasion();
-    final void lowerStats(int amount){
+
+    final int increaseStats(int amount) {
+        buff = (buff > amount) ? buff : amount;
+        return buff;
+    }
+    final int lowerStats(int amount){
         debuff = (debuff > amount) ? debuff : amount;
+        return debuff;
     }
 }

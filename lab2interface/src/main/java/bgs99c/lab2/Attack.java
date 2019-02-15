@@ -31,20 +31,7 @@ public final class Effect{
         EffectType type;
         int value;
         final int cost(){
-            switch (type){
-                case STUN:
-                    return 10 * value;
-                case LEECH:
-                    return 4 * value;
-                case STATS:
-                    return 12 * value;
-                case PERIODIC:
-                    return 5 * value;
-                case DAMAGE:
-                    return value;
-                default:
-                    return 0;
-            }
+            return type.price*value;
         }
     }
 
@@ -53,26 +40,41 @@ public enum EffectType{
         /**
          * Applies raw damage
          */
-        DAMAGE,
+        DAMAGE(1, true),
         /**
          * Adds periodic damage that gradually wears off
          */
-        PERIODIC,
+        PERIODIC(5, true),
         /**
          * Damages target and heals user for a part of that damage
          */
-        LEECH,
+        LEECH(4, true),
         /**
          * Stuns target
          */
-        STUN,
+        STUN(10, true),
+        /**
+         * Heals target
+         */
+        HEAL(6, false),
         /**
          * Adds debuff to target's stats
          */
-        STATS
+        STATS_DOWN(12, true),
+        /**
+         * Adds buff to your own stats
+         */
+        STATS_UP(12, false);
+
+        int price;
+        boolean negative;
+        EffectType(int price, boolean negative) {
+            this.price = price;
+            this.negative = negative;
+        }
     }
 
-public Log apply(Battle b){
+public final Log apply(Battle b){
 throw new UnsupportedOperationException();
 }
 }
