@@ -126,8 +126,21 @@ public abstract class Attack extends Move{
         OutputLogger.log(description(b.currentFighter(), b.currentOpponent()));
 
         if(!rollDice(b.currentFighter(), b.currentOpponent())){
-            return Log.Fail(b.currentFighter(),b.getCurrentPlayer());
+            try {
+                String evasionMessage = ((Fighter) b.currentOpponent()).evasionMessage(b.currentFighter());
+                OutputLogger.message(evasionMessage, b.currentOpponent(), b.getCurrentPlayer());
+            } catch (Exception ignored){
+
+            }
+            OutputLogger.message(
+                    b.currentFighter().missedMessage(b.currentOpponent()),
+                    b.currentFighter(),
+                    b.getCurrentPlayer()
+            );
+            return Log.Fail(b.currentFighter(), b.getCurrentPlayer());
         }
+
+        boolean offence = false;
 
         int damageResult    = 0;
         int debuffResult    = 0;
@@ -161,16 +174,19 @@ public abstract class Attack extends Move{
                     break;
 
                 case DAMAGE:
+                    offence = true;
                     damageResult += b.currentOpponent()
                             .applyDamage(value + b.currentFighter().getPower());
                     break;
 
                 case STATS_DOWN:
+                    offence = true;
                     debuffResult = b.currentOpponent()
                             .lowerStats(value);
                     break;
 
                 case LEECH:
+                    offence = true;
                     int dmg = b.currentOpponent()
                             .applyDamage(value);
                     healResult += b.currentFighter()
@@ -179,12 +195,14 @@ public abstract class Attack extends Move{
                     break;
 
                 case STUN:
+                    offence = true;
                     b.currentOpponent()
                             .addStun(value);
-                    stunResult+=value;
+                    stunResult += value;
                     break;
 
                 case PERIODIC:
+                    offence = true;
                     b.currentOpponent()
                             .addPeriodicDamage(value);
                     periodicResult += value;
@@ -196,6 +214,25 @@ public abstract class Attack extends Move{
                     break;
 
             }
+        }
+        if(damageResult == 0 && debuffResult == 0 && stunResult == 0 && periodicResult == 0 && offence){
+            try {
+                String ignoredMessage = ((Fighter) b.currentOpponent()).defendedMessage(b.currentFighter());
+                OutputLogger.message(ignoredMessage, b.currentOpponent(), b.getCurrentPlayer());
+            } catch (Exception ignored){
+
+            }
+            OutputLogger.message(
+                    b.currentFighter().unsuccessfulAttackMessage(b.currentOpponent()),
+                    b.currentFighter(),
+                    b.getCurrentPlayer()
+            );
+        } else if(offence) {
+            OutputLogger.message(
+                    b.currentFighter().successfulAttackMessage(b.currentOpponent()),
+                    b.currentFighter(),
+                    b.getCurrentPlayer()
+            );
         }
         return new AttackLog(
                 b.currentFighter(),

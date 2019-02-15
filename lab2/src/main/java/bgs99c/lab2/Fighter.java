@@ -170,7 +170,27 @@ public abstract class Fighter extends FighterInfo{
                 break;
         }
     }
-
+    public  String missedMessage(FighterInfo target) {
+        return null;
+    }
+    public String dyingMessage(FighterInfo killer) {
+        return null;
+    }
+    public String enterFightMessage() {
+        return null;
+    }
+    public String evasionMessage(FighterInfo attacker){
+        return null;
+    }
+    public String defendedMessage(FighterInfo attacker){
+        return null;
+    }
+    public String successfulAttackMessage(FighterInfo target){
+        return null;
+    }
+    public String unsuccessfulAttackMessage(FighterInfo target) {
+        return null;
+    }
     /**
      * Returns current health considering damage in battle
      */

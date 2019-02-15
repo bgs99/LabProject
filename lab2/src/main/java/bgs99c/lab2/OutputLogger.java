@@ -19,6 +19,11 @@ public class OutputLogger {
 			markTurn(new ArrayList<>());
 		return log;
 	}
+	public static void message(String a, FighterInfo f, Player p){
+		if(a == null || a.length() == 0)
+			return;
+		cur.logs.add(new MessageLog(f, a, p));
+	}
 	public static void clear() {
 		log.clear();
 	}

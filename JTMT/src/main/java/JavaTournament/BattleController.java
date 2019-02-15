@@ -11,13 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import bgs99c.client.*;
-import bgs99c.lab2.AttackLog;
-import bgs99c.lab2.DeathLog;
-import bgs99c.lab2.Log;
-import bgs99c.lab2.PeriodicDamageLog;
-import bgs99c.lab2.Record;
-import bgs99c.lab2.ReplacementLog;
-import bgs99c.lab2.TeamLog;
+import bgs99c.lab2.*;
 import bgs99c.lab2.shared.AttackResult;
 import bgs99c.lab2.shared.FighterStats;
 import bgs99c.lab2.shared.LogId;
@@ -149,6 +143,7 @@ public class BattleController {
 				apid = l.getPlayer();
 			
 			Map<LogId, FighterStats> team, oteam;
+
 			if(l.getPlayer().equals(apid)) {
 				team = fightersA;
 				oteam = fightersB;
@@ -205,8 +200,11 @@ public class BattleController {
 					else curB = team.get(rl.getReplacement());
 					updateFighters(team);
 					break;
+				case MESSAGE:
+					MessageLog ml = (MessageLog) l;
+					System.out.println(ml.getSubject().name + " said: \""+ml.message + "\"");
 				default:
-					System.out.println(l.getType());
+					System.out.println();
 			}
 		}
 		LogId p = logs.get(0).getPlayer();

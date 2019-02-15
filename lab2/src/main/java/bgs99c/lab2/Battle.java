@@ -169,6 +169,7 @@ public final class Battle {
 
 
         if(team.current.getHealth()<=0){
+            OutputLogger.message(team.current.dyingMessage(opponentFighter()), team.current, team.player);
         	record(new DeathLog(team.current, currentPlayer));
 
         	OutputLogger.log(team.current + " is dead");
@@ -182,9 +183,10 @@ public final class Battle {
                 return opponentInfo().winState;
             }
 
-            while(team.current.getHealth()<=0){
+            while(team.current.getHealth() <= 0){
             	FighterInfo last = team.current;
                 team.current = team.player.getStrategy().replaceDead();
+                OutputLogger.message(team.current.enterFightMessage(), team.current, team.player);
                 ReplacementLog rl = new ReplacementLog(last, team.current, currentPlayer);
                 record(rl);
             }
@@ -276,6 +278,7 @@ public final class Battle {
             player.fought = true;
             alive = FIGHTERS;
             current = squad[0];
+            OutputLogger.message(current.enterFightMessage(), current, player);
             List<Log> logs = new ArrayList<>();
             for(Fighter f : squad){
                 f.reset();

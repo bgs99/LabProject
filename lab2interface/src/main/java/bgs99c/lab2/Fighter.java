@@ -37,6 +37,27 @@ throw new UnsupportedOperationException();
 public final void increaseStat(int amount, Stats stat){
 throw new UnsupportedOperationException();
 }
+public  String missedMessage(FighterInfo target) {
+throw new UnsupportedOperationException();
+}
+public String dyingMessage(FighterInfo killer) {
+throw new UnsupportedOperationException();
+}
+public String enterFightMessage() {
+throw new UnsupportedOperationException();
+}
+public String evasionMessage(FighterInfo attacker){
+throw new UnsupportedOperationException();
+}
+public String defendedMessage(FighterInfo attacker){
+throw new UnsupportedOperationException();
+}
+public String successfulAttackMessage(FighterInfo target){
+throw new UnsupportedOperationException();
+}
+public String unsuccessfulAttackMessage(FighterInfo target) {
+throw new UnsupportedOperationException();
+}
 public final int getHealth(){
 throw new UnsupportedOperationException();
 }

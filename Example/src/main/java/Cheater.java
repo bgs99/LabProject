@@ -11,6 +11,41 @@ public class Cheater extends Player {
 }
 
 class Hacker extends Fighter{
+    @Override
+    public String defendedMessage(FighterInfo attacker) {
+        return "u c4n'7 h4rm m3";
+    }
+
+    @Override
+    public String dyingMessage(FighterInfo killer) {
+        return "1'll b3 b4ck";
+    }
+
+    @Override
+    public String enterFightMessage() {
+        return "h4ck1n6 71m3";
+    }
+
+    @Override
+    public String evasionMessage(FighterInfo attacker) {
+        return "c47ch m3 1f u c4n";
+    }
+
+    @Override
+    public String successfulAttackMessage(FighterInfo target) {
+        return "607ch4";
+    }
+
+    @Override
+    public String unsuccessfulAttackMessage(FighterInfo target) {
+        return "1'll 637 u n3x7 71m3";
+    }
+
+    @Override
+    public String missedMessage(FighterInfo target) {
+        return unsuccessfulAttackMessage(target);
+    }
+
     private static int id = 0;
     Hacker() {
         super("Hacker_" + id);
