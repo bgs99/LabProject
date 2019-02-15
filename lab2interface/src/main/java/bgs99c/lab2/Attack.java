@@ -48,7 +48,7 @@ public enum EffectType{
         /**
          * Damages target and heals user for a part of that damage
          */
-        LEECH(4, true),
+        LEECH(6, true),
         /**
          * Stuns target
          */
@@ -56,7 +56,7 @@ public enum EffectType{
         /**
          * Heals target
          */
-        HEAL(6, false),
+        HEAL(4, false),
         /**
          * Adds debuff to target's stats
          */

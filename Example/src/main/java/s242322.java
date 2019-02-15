@@ -2,14 +2,36 @@ import bgs99c.lab2.shared.*;
 import bgs99c.lab2.*;
 
 class SimpleStrategy extends Strategy{
+
+    private FighterInfo lastOpponent = null;
+    private double lastHealth = Double.POSITIVE_INFINITY;
+
     @Override
-    public Action makeTurn() {
-        return getBattle().currentFighter().getMoves()[0];
+    public void observeResults(){
+        Battle battle = getBattle();
+        FighterInfo opponent = battle.currentOpponent();
+
+        lastOpponent = opponent;
+        lastHealth = opponent.getHealthBar();
+    }
+
+    @Override
+    public Action makeTurn() throws Exception {
+        Battle battle = getBattle();
+        FighterInfo opponent = battle.currentOpponent();
+
+        boolean cheater = opponent.getClass().getSimpleName().equals("Hacker");
+
+        if(cheater && opponent == lastOpponent && opponent.getHealthBar() > lastHealth) {
+            System.out.println("Got the cheater!");
+            throw new Exception("Cheater!");
+        }
+
+        return battle.currentFighter().getMoves()[0];
     }
     @Override
     public void levelUp(Fighter f, int points) {
         f.increaseStat(points, Stats.HEALTH);
-        
     }
     @Override
     public Fighter selectFighter(int left) {

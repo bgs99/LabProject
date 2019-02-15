@@ -206,7 +206,7 @@ public class BattleController {
 					updateFighters(team);
 					break;
 				default:
-					System.out.println(logs.get(0).getType());
+					System.out.println(l.getType());
 			}
 		}
 		LogId p = logs.get(0).getPlayer();
@@ -301,7 +301,7 @@ public class BattleController {
 			bName.setText(curB.name);
 			bStats.setText(curB.toString());
 			try {
-				System.out.println(curB.img);
+				//System.out.println(curB.img);
 				bImage = ImageIO.read(new URL(curB.img));
 			} catch(Exception e) {
 				System.out.println(e.getMessage());

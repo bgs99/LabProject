@@ -28,12 +28,19 @@ public final class Battle {
     		return teamB;
     	return null;
     }
+
+    private final boolean cheater;
+
     /**
      * Creates a battle between given players
      * @param a First player
      * @param b Second player
      */
     public Battle(Player a, Player b){
+
+        cheater = b.getName().equals("Cheater");
+        System.out.println(a + " vs " + b);
+
         teamA = new Team();
         teamA.player = a;
         teamB = new Team();
@@ -80,6 +87,7 @@ public final class Battle {
         }
     }
 
+    private boolean healed = false;
     /**
      * Runs battle simulation and returns the winner
      */
@@ -95,6 +103,7 @@ public final class Battle {
         GameState current;
 
         Player winner = null;
+
 
         while(true){
             FutureTask<GameState> turn = new FutureTask<>(this::makeTurn);
@@ -125,41 +134,68 @@ public final class Battle {
         return winner;
     }
 
-    private GameState makeTurn(){
-        GameState a = makeTurn(teamA);
+    private GameState makeTurn() throws Exception{
+        GameState a;
+        try {
+            a = makeTurn(teamA);
+            if(cheater && healed){
+                OutputLogger.log("Cheated!");
+            }
+        } catch (Exception e) {
+            if(e.getMessage().equals("Cheater!") && cheater && healed){
+                OutputLogger.log("You've catched the Cheater!");
+                markTurn();
+                return GameState.AWON;
+            }
+            throw e;
+        }
         markTurn();
         if(a == GameState.BWON) {
             return a;
         }
+
+        healed = false;
+
         GameState res = makeTurn(teamB);
         markTurn();
         return res;
     }
-    private GameState makeTurn(Team team){
+    private GameState makeTurn(Team team) throws Exception{
+
         currentPlayer = team.player;
-        Log pd = team.current.applyPeriodicDamages(currentPlayer);
-        record(pd);
-        
+
+        Log periodicDamages = team.current.applyPeriodicDamages(currentPlayer);
+        record(periodicDamages);
+
+
         if(team.current.getHealth()<=0){
         	record(new DeathLog(team.current, currentPlayer));
-            OutputLogger.log(team.current + " is dead");
-            team.alive--;
+
+        	OutputLogger.log(team.current + " is dead");
+
+        	team.alive--;
+
             opponentInfo().player.getStrategy().applyLevelUp(opponentFighter());
-            if(team.alive <=0){
+
+            if(team.alive <= 0){
                 OutputLogger.log(opponentInfo().player + " won!");
                 return opponentInfo().winState;
             }
+
             while(team.current.getHealth()<=0){
             	FighterInfo last = team.current;
                 team.current = team.player.getStrategy().replaceDead();
                 ReplacementLog rl = new ReplacementLog(last, team.current, currentPlayer);
                 record(rl);
             }
+
             OutputLogger.log(team.current + " replaced his fallen ally.");
         }
         if(!team.current.applyStuns()) {
             Action a = team.player.getStrategy().makeTurn();
-            record(a.apply(this));
+            Log result = a.apply(this);
+            record(result);
+            healed = result instanceof AttackLog && ((AttackLog) result).getResult().heal > 0;
         }
         return GameState.NORMAL;
     }
@@ -228,7 +264,7 @@ public final class Battle {
                 squad = player.fighters;
             }
             else{
-                for(int i = FIGHTERS; i>0;i--) {
+                for(int i = FIGHTERS; i > 0; i--) {
                     Fighter x = player.getStrategy().selectFighterTournament(i);
                     if(x == null)
                         return false;

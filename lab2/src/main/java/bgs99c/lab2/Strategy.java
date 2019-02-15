@@ -10,13 +10,16 @@ public abstract class Strategy {
         battle = b;
     }
     private Battle battle;
+
+    public void observeResults(){}
+
     public Battle getBattle(){
         return battle;
     }
     /**
      * This method should chose next action in a battle
      */
-    public abstract Action makeTurn();
+    public abstract Action makeTurn() throws Exception;
 
     /**
      * This method decides how to spend talent points on level up
