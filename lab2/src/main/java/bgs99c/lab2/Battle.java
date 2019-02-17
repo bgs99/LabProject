@@ -115,7 +115,7 @@ public final class Battle {
                 turn.run();
                 current = turn.get(1, TimeUnit.SECONDS);
             }
-            catch(Exception | StackOverflowError| OutOfMemoryError e){
+            catch(Exception | StackOverflowError| OutOfMemoryError | OPError e){
                 e.printStackTrace();
                 logger.log("Exception in async");
                 winner = opponentInfo().player;
