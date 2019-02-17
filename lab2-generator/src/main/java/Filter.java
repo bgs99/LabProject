@@ -22,7 +22,7 @@ public class Filter {
             e.printStackTrace();
         }
     }
-    private String[] hidden = {"start"};
+    private String[] hidden = {"start", "logger"};
     private String[] full = {"enum", "class", "interface"};
 
     private int readBlock(int start){

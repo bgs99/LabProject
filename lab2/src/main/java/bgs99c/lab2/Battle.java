@@ -6,12 +6,13 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
 public final class Battle {
+    public OutputLogger logger;
     private Team teamA, teamB;
     private List<Log> log, turnLog;
     private Player currentPlayer;
     private final static int FIGHTERS = 3;
     private void markTurn() {
-    	OutputLogger.markTurn(turnLog);
+    	logger.markTurn(turnLog);
         turnLog = new ArrayList<>();
     }
     Player getCurrentPlayer(){
@@ -31,13 +32,16 @@ public final class Battle {
 
     private final boolean cheater;
 
+    public Battle(Player a, Player b){
+        this(a, b, new OutputLogger());
+    }
     /**
      * Creates a battle between given players
      * @param a First player
      * @param b Second player
      */
-    public Battle(Player a, Player b){
-
+    public Battle(Player a, Player b, OutputLogger logger){
+        this.logger = logger;
         cheater = b.getName().equals("Cheater");
         System.out.println(a + " vs " + b);
 
@@ -113,7 +117,7 @@ public final class Battle {
             }
             catch(Exception | StackOverflowError| OutOfMemoryError e){
                 e.printStackTrace();
-                OutputLogger.log("Exception in async");
+                logger.log("Exception in async");
                 winner = opponentInfo().player;
                 break;
             }
@@ -139,11 +143,11 @@ public final class Battle {
         try {
             a = makeTurn(teamA);
             if(cheater && healed){
-                OutputLogger.log("Cheated!");
+                logger.log("Cheated!");
             }
         } catch (Exception e) {
             if(e.getMessage().equals("Cheater!") && cheater && healed){
-                OutputLogger.log("You've catched the Cheater!");
+                logger.log("You've catched the Cheater!");
                 markTurn();
                 return GameState.AWON;
             }
@@ -164,34 +168,34 @@ public final class Battle {
 
         currentPlayer = team.player;
 
-        Log periodicDamages = team.current.applyPeriodicDamages(currentPlayer);
+        Log periodicDamages = team.current.applyPeriodicDamages(currentPlayer, logger);
         record(periodicDamages);
 
 
         if(team.current.getHealth()<=0){
-            OutputLogger.message(team.current.dyingMessage(opponentFighter()), team.current, team.player);
+            logger.message(team.current.dyingMessage(opponentFighter()), team.current, team.player);
         	record(new DeathLog(team.current, currentPlayer));
 
-        	OutputLogger.log(team.current + " is dead");
+        	logger.log(team.current + " is dead");
 
         	team.alive--;
 
-            opponentInfo().player.getStrategy().applyLevelUp(opponentFighter());
+            opponentInfo().player.getStrategy().applyLevelUp(opponentFighter(), logger);
 
             if(team.alive <= 0){
-                OutputLogger.log(opponentInfo().player + " won!");
+                logger.log(opponentInfo().player + " won!");
                 return opponentInfo().winState;
             }
 
             while(team.current.getHealth() <= 0){
             	FighterInfo last = team.current;
                 team.current = team.player.getStrategy().replaceDead();
-                OutputLogger.message(team.current.enterFightMessage(), team.current, team.player);
+                logger.message(team.current.enterFightMessage(), team.current, team.player);
                 ReplacementLog rl = new ReplacementLog(last, team.current, currentPlayer);
                 record(rl);
             }
 
-            OutputLogger.log(team.current + " replaced his fallen ally.");
+            logger.log(team.current + " replaced his fallen ally.");
         }
         if(!team.current.applyStuns()) {
             Action a = team.player.getStrategy().makeTurn();
@@ -270,7 +274,7 @@ public final class Battle {
                     Fighter x = player.getStrategy().selectFighterTournament(i);
                     if(x == null)
                         return false;
-                    OutputLogger.log(player + " selected " + x);
+                    logger.log(player + " selected " + x);
                     squad[FIGHTERS-i] = x;
                 }
             }
@@ -278,13 +282,13 @@ public final class Battle {
             player.fought = true;
             alive = FIGHTERS;
             current = squad[0];
-            OutputLogger.message(current.enterFightMessage(), current, player);
+            logger.message(current.enterFightMessage(), current, player);
             List<Log> logs = new ArrayList<>();
             for(Fighter f : squad){
                 f.reset();
                 logs.add(new TeamLog(f, player));
             }
-            OutputLogger.markTurn(logs);
+            logger.markTurn(logs);
             return true;
         }
     }

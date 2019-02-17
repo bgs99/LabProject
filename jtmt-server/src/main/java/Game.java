@@ -1,6 +1,7 @@
 import bgs99c.lab2.Tournament;
 import bgs99c.shared.UserStats;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.HashMap;
@@ -24,21 +25,22 @@ public class Game {
 	public static List<String> getPlayers(){
 		return players.values().stream().map(x -> x.getClass().getName()).collect(Collectors.toList());
 	}
-	public static void clearLogs() {
-		OutputLogger.clear();
-	}
-	public static List<Record> getLogs() {
-		return OutputLogger.getLogs();
-	}
+	public static List<Record> logs = new ArrayList<>();
 	public String Battle(String user, String opponent) {
 
 		Battle b = new Battle(players.get(user), players.get(opponent));
-		return b.start().getClass().getName();
+
+		String name = b.start().getClass().getName();
+
+		logs = b.logger.getLogs();
+		return name;
 	}
 	public List<String> Tournament() {
 		Tournament t = new Tournament(players.values().toArray(new Player[] {}));
 		List<Player> ranks = t.start();
-		return ranks.stream().map(x -> x.getClass().getName()).collect(Collectors.toList());
+		List<String> results = ranks.stream().map(x -> x.getClass().getName()).collect(Collectors.toList());
+		logs = t.logger.getLogs();
+		return results;
 	}
 	public void Test() {
 		Player p1 = Loader.loadPlayer("s242322");

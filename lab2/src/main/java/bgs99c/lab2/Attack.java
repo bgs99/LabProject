@@ -108,31 +108,31 @@ public abstract class Attack extends Move{
             this.negative = negative;
         }
     }
-    private boolean rollDice(Fighter attack, FighterInfo defence){
+    private boolean rollDice(Fighter attack, FighterInfo defence, OutputLogger logger){
         Random r = new Random();
         int v = r.nextInt(100);
         if (v > accuracy + attack.getAccuracy() - defence.getEvasion()){
-            OutputLogger.log(defence + " evaded " + attack + "'s attack");
+            logger.log(defence + " evaded " + attack + "'s attack");
             return false;
         }
         return true;
     }
     public final Log apply(Battle b){
         if(! Arrays.asList(b.currentFighter().getMoves()).contains(this)) {
-            OutputLogger.log(b.currentFighter() + " doesn't know how to use " + this);
+            b.logger.log(b.currentFighter() + " doesn't know how to use " + this);
             return Log.Fail(b.currentFighter(),b.getCurrentPlayer());
         }
 
-        OutputLogger.log(description(b.currentFighter(), b.currentOpponent()));
+        b.logger.log(description(b.currentFighter(), b.currentOpponent()));
 
-        if(!rollDice(b.currentFighter(), b.currentOpponent())){
+        if(!rollDice(b.currentFighter(), b.currentOpponent(), b.logger)){
             try {
                 String evasionMessage = ((Fighter) b.currentOpponent()).evasionMessage(b.currentFighter());
-                OutputLogger.message(evasionMessage, b.currentOpponent(), b.getCurrentPlayer());
+                b.logger.message(evasionMessage, b.currentOpponent(), b.getCurrentPlayer());
             } catch (Exception ignored){
 
             }
-            OutputLogger.message(
+            b.logger.message(
                     b.currentFighter().missedMessage(b.currentOpponent()),
                     b.currentFighter(),
                     b.getCurrentPlayer()
@@ -159,9 +159,9 @@ public abstract class Attack extends Move{
                 valueK *= checkEffect(type, t);
 
             if(valueK >=2 ) {
-                OutputLogger.log("It's super effective!");
+                b.logger.log("It's super effective!");
             } else if(valueK <= 0.5) {
-                OutputLogger.log("It's not very effective...");
+                b.logger.log("It's not very effective...");
             }
 
             int value = (int) (e.value * valueK);
@@ -170,13 +170,13 @@ public abstract class Attack extends Move{
 
                 case HEAL:
                     healResult += b.currentFighter()
-                            .heal(value);
+                            .heal(value, b.logger);
                     break;
 
                 case DAMAGE:
                     offence = true;
                     damageResult += b.currentOpponent()
-                            .applyDamage(value + b.currentFighter().getPower());
+                            .applyDamage(value + b.currentFighter().getPower(), b.logger);
                     break;
 
                 case STATS_DOWN:
@@ -188,9 +188,9 @@ public abstract class Attack extends Move{
                 case LEECH:
                     offence = true;
                     int dmg = b.currentOpponent()
-                            .applyDamage(value);
+                            .applyDamage(value, b.logger);
                     healResult += b.currentFighter()
-                            .heal(dmg);
+                            .heal(dmg, b.logger);
                     damageResult += dmg;
                     break;
 
@@ -204,7 +204,7 @@ public abstract class Attack extends Move{
                 case PERIODIC:
                     offence = true;
                     b.currentOpponent()
-                            .addPeriodicDamage(value);
+                            .addPeriodicDamage(value, b.logger);
                     periodicResult += value;
                     break;
 
@@ -218,17 +218,17 @@ public abstract class Attack extends Move{
         if(damageResult == 0 && debuffResult == 0 && stunResult == 0 && periodicResult == 0 && offence){
             try {
                 String ignoredMessage = ((Fighter) b.currentOpponent()).defendedMessage(b.currentFighter());
-                OutputLogger.message(ignoredMessage, b.currentOpponent(), b.getCurrentPlayer());
+                b.logger.message(ignoredMessage, b.currentOpponent(), b.getCurrentPlayer());
             } catch (Exception ignored){
 
             }
-            OutputLogger.message(
+            b.logger.message(
                     b.currentFighter().unsuccessfulAttackMessage(b.currentOpponent()),
                     b.currentFighter(),
                     b.getCurrentPlayer()
             );
         } else if(offence) {
-            OutputLogger.message(
+            b.logger.message(
                     b.currentFighter().successfulAttackMessage(b.currentOpponent()),
                     b.currentFighter(),
                     b.getCurrentPlayer()

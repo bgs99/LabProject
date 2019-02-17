@@ -40,7 +40,7 @@ public abstract class FighterInfo {
     protected int typePoints = 0;
 
     
-    abstract Log applyPeriodicDamages(Player you);
+    abstract Log applyPeriodicDamages(Player you, OutputLogger logger);
     final boolean applyStuns() {
         if(stun <= 0) {
             return false;
@@ -57,7 +57,7 @@ public abstract class FighterInfo {
     final void addStun(int time){
         stun = (stun > time) ? stun : time;
     }
-    abstract void addPeriodicDamage(int value);
+    abstract void addPeriodicDamage(int value, OutputLogger logger);
     public final String toString(){
         return this.getClass().getSimpleName() + " " + name;
     }
@@ -66,7 +66,7 @@ public abstract class FighterInfo {
      * @return current health
      */
     public abstract double getHealthBar();
-    abstract int applyDamage(int amount);
+    abstract int applyDamage(int amount, OutputLogger logger);
     abstract int getEvasion();
 
     final int increaseStats(int amount) {

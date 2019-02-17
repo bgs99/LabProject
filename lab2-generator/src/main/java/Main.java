@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args){
-        String[] skip = {"Tournament", "Play", "OutputLogger", "MySecurityManager"};
+        String[] skip = {"Tournament", "Play", "OutputLogger", "MySecurityManager", "OPError"};
         String[] l = new File("lab2/src/main/java/bgs99c/lab2/").list();
         for(String g : l){
             String r = g.substring(0, g.indexOf('.'));

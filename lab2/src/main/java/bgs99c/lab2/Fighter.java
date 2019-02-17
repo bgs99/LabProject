@@ -34,8 +34,7 @@ public abstract class Fighter extends FighterInfo{
      */
     public final void addType(Types t){
         if(typePoints <= 0){
-            OutputLogger.log("Too many types for " + this);
-            return;
+            throw new OPError();
         }
         types.add(t);
         typePoints--;
@@ -62,17 +61,17 @@ public abstract class Fighter extends FighterInfo{
      */
     public final void addMove(Move m){
         if(movesLeft <=0){
-            OutputLogger.log(this.getClass().getSimpleName() + " cannot learn so many moves.");
-            return;
+            throw new OPError();
         }
         movesLeft--;
         moves.add(m);
     }
-    final Log applyPeriodicDamages(Player you){
+    @Override
+    final Log applyPeriodicDamages(Player you, OutputLogger logger){
         int sum = 0;
         for(int i = 0; i < periodicDamages.size(); i++){
             int damage = periodicDamages.get(i);
-            OutputLogger.log(this + " is losing " + damage + " HP because of periodic damage.");
+            logger.log(this + " is losing " + damage + " HP because of periodic damage.");
             health -= damage;
             sum += damage;
             periodicDamages.set(i, damage-1);
@@ -83,27 +82,29 @@ public abstract class Fighter extends FighterInfo{
         }
         return new PeriodicDamageLog(this, you, sum);
     }
-    final void addPeriodicDamage(int value){
+    @Override
+    final void addPeriodicDamage(int value, OutputLogger logger){
         if(value < 0){
             return;
         }
-        OutputLogger.log("It's " + value + " points of periodic damage!");
+        logger.log("It's " + value + " points of periodic damage!");
         periodicDamages.add(value);
     }
-    final int applyDamage(int amount){
+    @Override
+    final int applyDamage(int amount, OutputLogger logger){
         if(amount <= defence){
-            OutputLogger.log("This attack is too weak");
+            logger.log("This attack is too weak");
             return 0;
         }
-        OutputLogger.log("It did " + (amount-defence) + " damage");
+        logger.log("It did " + (amount-defence) + " damage");
         health -= amount - defence;
         return amount - defence;
     }
-    final int heal(int amount){
+    final int heal(int amount, OutputLogger logger){
         int previousHealth = health;
         health += amount;
         health = health > maxhealth ? maxhealth : health;
-        OutputLogger.log(this + "is healed for " + (health - previousHealth) + " HP.");
+        logger.log(this + "is healed for " + (health - previousHealth) + " HP.");
         return health - previousHealth;
     }
 
@@ -147,8 +148,7 @@ public abstract class Fighter extends FighterInfo{
      */
     public final void increaseStat(int amount, Stats stat){
         if(talentPoints < amount){
-            OutputLogger.log(this.getClass().getSimpleName() + " has exceeded it's talent points limits.");
-            return;
+            throw new OPError();
         }
         talentPoints -= amount;
         switch (stat){
