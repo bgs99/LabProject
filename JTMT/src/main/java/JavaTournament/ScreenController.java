@@ -7,11 +7,13 @@ import sun.audio.AudioPlayer;
 import sun.audio.AudioStream;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.*;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,6 +22,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -37,17 +40,13 @@ public class ScreenController {
     private Button battleBtn;
     private final int LOGINPAGE_HEIGHT = 530;
     private final int LOGINPAGE_WIDTH = 800;
-	/*private final ObservableList<PlayerModel> data =
-	        FXCollections.observableArrayList();*/
+
 	ScreenController(Client client, JFrame frame) throws URISyntaxException {
 		this.client = client;
 		this.frame = frame;
         Background panel1 = new Background(client, frame);
-
-        //Костыль, у меня в Ubuntu почему-то Java считает что 2 экрана, потом потесчу на винде
         GraphicsEnvironment environment =
                 GraphicsEnvironment.getLocalGraphicsEnvironment();
-
         GraphicsDevice[] devices = environment.getScreenDevices();
             DisplayMode dmode = devices[0].getDisplayMode();
             int screenWidth = dmode.getWidth();
@@ -70,16 +69,7 @@ public class ScreenController {
       	}
 
 
-	
-	public void selectFile() throws IOException {
-		/*FileChooser fileChooser = new FileChooser();
-		fileChooser.getExtensionFilters().addAll(
-		         new ExtensionFilter("Java libraries", "*.jar"));
-		File file = fileChooser.showOpenDialog(window);
-		if(file==null)
-			return;
-		client.sendFile(file);*/
-	}
+
 	
 
 	
@@ -87,111 +77,105 @@ public class ScreenController {
 
 
 class Background extends JPanel {
-private JLabel connectionStatus;
-    private Label teamName;
-    private Button tour;
-    AudioStream s = null;
-    private Button battleBtn;
-    private JFrame frame;
 
+    AudioStream s = null;
+    private JFrame frame;
     private Client client;
 
-    private String selectedPlayer = null;
-
-    private PlayerTableModel data = new PlayerTableModel();
-
+    JLabel orLabel ;
+    JButton battleButton ;
+    JButton  tournamentLabel ;
+    JLabel connectionStatusLabel ;
+    JButton  disconnectButton ;
+    JLabel yourStatsLabel ;
+    JLabel stat1Label;
+    JLabel stat2Label;
+    JLabel stat3Label ;
+    JLabel youcanstartLabel;
     public Background (Client client, JFrame frame) {
         this.frame = frame;
         this.client = client;
-        JTable table = new JTable(data);
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent listSelectionEvent) {
-                int[] selectedRows = table.getSelectedRows();
-                if (selectedRows.length == 0) {
-                    battleBtn.setEnabled(false);
-                    return;
-                }
-                int i = selectedRows[0];
-                selectedPlayer = data.getRow(i).getName();
-                battleBtn.setEnabled(!selectedPlayer.equals(client.name));
-                teamName.setText("Team " + selectedPlayer);
-                //TODO fill detailsList
-            }
-        });
-        JButton battle;
-        JButton tournament;
-       JLabel connectionStatus;
-        JLabel orLabel;
-       JButton disconnect = new JButton();
-       JLabel youcanstartLabel;
-     JList jList1;
-      JScrollPane jScrollPane1;
 
 
-        battle = new javax.swing.JButton();
-        tournament = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList();
-        connectionStatus = new javax.swing.JLabel();
-        orLabel = new javax.swing.JLabel();
-        youcanstartLabel = new javax.swing.JLabel();
+       orLabel = new JLabel();
+      battleButton = new JButton();
+       tournamentLabel = new JButton();
+      connectionStatusLabel = new JLabel();
+        disconnectButton = new JButton();
+       yourStatsLabel = new JLabel();
+       stat1Label = new JLabel();
+       stat2Label = new JLabel();
+        stat3Label = new JLabel();
+              youcanstartLabel = new JLabel();   
+        Font CustomFont;
+        Font customFont18 = null;
+        try {
 
-        setPreferredSize(new java.awt.Dimension(800, 500));
+            URL resource  = ScreenController.class.getResource("/beermoney.ttf");
+            String TTFpath = Paths.get(resource.toURI()).toString();
+            CustomFont = Font.createFont(Font.TRUETYPE_FONT, new FileInputStream(TTFpath));
+            customFont18 = CustomFont.deriveFont(16.0F); //11 шрифт
+        }
+        catch (FontFormatException e2) 	 {e2.printStackTrace();}
+        catch (IOException e2) 			 {e2.printStackTrace();} catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
 
-        battle.setBackground(new java.awt.Color(128, 0, 0));
-        battle.setFont(new java.awt.Font("Purisa", 0, 11)); // NOI18N
-        battle.setForeground(new java.awt.Color(255, 248, 220));
-        battle.setText("Battle");
-        disconnect.setBackground(new java.awt.Color(128, 0, 0));
-     disconnect.setFont(new java.awt.Font("Purisa", 0, 11)); // NOI18N
-        disconnect.setForeground(new java.awt.Color(255, 248, 220));
-        disconnect.setText("Disconnect");
-//        battle.addActionListener(new java.awt.event.ActionListener() {
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                battleActionPerformed(evt);
-//            }
-//        });
+        orLabel.setFont(customFont18);
+       battleButton.setFont(customFont18);
+       tournamentLabel.setFont(customFont18);
+       connectionStatusLabel.setFont(customFont18);
+       disconnectButton.setFont(customFont18);
+       youcanstartLabel.setFont(customFont18);
+        yourStatsLabel.setFont(customFont18);
+        stat1Label.setFont(customFont18);
+        stat2Label.setFont(customFont18);
+        stat3Label.setFont(customFont18);
 
-        tournament.setBackground(new java.awt.Color(128, 0, 0));
-        tournament.setFont(new java.awt.Font("Purisa", 0, 11)); // NOI18N
-        tournament.setForeground(new java.awt.Color(255, 248, 220));
-        tournament.setText("Tournament");
-//        tournament.addActionListener(new java.awt.event.ActionListener() {
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                tournamentActionPerformed(evt);
-//            }
-//        });
 
-        jList1.setBackground(new java.awt.Color(128, 0, 0));
-        jList1.setFont(new java.awt.Font("Purisa", 0, 11)); // NOI18N
-        jList1.setForeground(new java.awt.Color(255, 248, 220));
-        jList1.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
-        });
-        jList1.setToolTipText("");
-        jScrollPane1.setViewportView(jList1);
+        setPreferredSize(new Dimension(800, 560));
 
-        connectionStatus.setFont(new java.awt.Font("Purisa", 0, 11)); // NOI18N
-        connectionStatus.setForeground(new java.awt.Color(255, 248, 220));
-        connectionStatus.setText("Connected as " + client.name);
-
-        orLabel.setFont(new java.awt.Font("Purisa", 0, 11)); // NOI18N
-        orLabel.setForeground(new java.awt.Color(255, 248, 220));
+        orLabel.setHorizontalAlignment(SwingConstants.CENTER);
         orLabel.setText("or");
 
-//        jLabel3.setFont(new java.awt.Font("Purisa", 0, 11)); // NOI18N
-//        jLabel3.setForeground(new java.awt.Color(255, 248, 220));
-//        jLabel3.setText("or");
+        battleButton.setText("Battle");
+       battleButton.setBackground(new java.awt.Color(128, 0, 0));
+       battleButton.setForeground(new java.awt.Color(255, 248, 220));
 
-        youcanstartLabel.setFont(new java.awt.Font("Purisa", 0, 11)); // NOI18N
-        youcanstartLabel.setForeground(new java.awt.Color(255, 248, 220));
+       battleButton.addActionListener(new ActionListener() {
+           @Override
+           public void actionPerformed(ActionEvent actionEvent) {
+                new SelectOpponentController(frame,client);
+           }
+       });
+
+        tournamentLabel.setText("Tournament");
+        tournamentLabel.setBackground(new java.awt.Color(128, 0, 0));
+        tournamentLabel.setForeground(new java.awt.Color(255, 248, 220));
+
+        connectionStatusLabel.setText("Connected as " + client.name);
+        connectionStatusLabel.setFont(customFont18);
+
+        disconnectButton.setText("Disconnect");
+        disconnectButton.setBackground(new java.awt.Color(128, 0, 0));
+        disconnectButton.setForeground(new java.awt.Color(255, 248, 220));
+        disconnectButton.addActionListener(this::disconnect);
+
+        yourStatsLabel.setText("Your stats:");
         youcanstartLabel.setText("You can start a");
+        youcanstartLabel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
-        disconnect.addActionListener(this::disconnect);
+        try {
+            stat1Label.setText("rank: " + client.getStats()[0].lastpos);
+            stat2Label.setText("score: " + client.getStats()[0].score);
+            stat3Label.setText("avgrank: " + client.getStats()[0].avgpos);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -199,89 +183,86 @@ private JLabel connectionStatus;
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addGroup(layout.createSequentialGroup()
-                                                .addGap(36, 36, 36)
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(youcanstartLabel)
-                                                        .addComponent(tournament)))
+                                                .addGap(43, 43, 43)
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                        .addComponent(orLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(youcanstartLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(battleButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(tournamentLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                                         .addGroup(layout.createSequentialGroup()
-                                                .addGap(34, 34, 34)
-                                                .addComponent(connectionStatus))
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addGap(80, 80, 80)
-                                                .addComponent(orLabel))
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addGap(54, 54, 54)
-                                                .addComponent(battle)))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 511, Short.MAX_VALUE)
+                                                .addContainerGap()
+                                                .addComponent(connectionStatusLabel)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 520, Short.MAX_VALUE)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(disconnect))
-                                .addGap(37, 37, 37))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                        .addComponent(stat1Label)
+                                                        .addGap(100, 100, 100))
+                                                .addGroup(layout.createSequentialGroup()
+                                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                .addComponent(stat2Label)
+                                                                .addComponent(stat3Label))
+                                                        .addContainerGap()))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                .addComponent(yourStatsLabel)
+                                                .addGap(30, 30, 30))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                .addComponent(disconnectButton)
+                                                .addContainerGap())))
         );
         layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addGap(50, 50, 50)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(youcanstartLabel)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(battle)
-
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(orLabel)
-                                                .addGap(1, 1, 1)
-                                                .addComponent(tournament)))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 305, Short.MAX_VALUE)
+                                .addGap(41, 41, 41)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(disconnect)
-                                        .addGap(33,33,33)
-                                        .addComponent(connectionStatus)))
+                                        .addComponent(youcanstartLabel)
+                                        .addComponent(yourStatsLabel))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(battleButton)
+                                        .addComponent(stat1Label))
+                                .addGap(7, 7, 7)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(orLabel)
+                                        .addComponent(stat2Label))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(tournamentLabel)
+                                        .addComponent(stat3Label))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 368, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(connectionStatusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(disconnectButton)))
         );
 
-
-        ///
         URL resource = ScreenController.class.getResource("/Main_menu_track.wav");
 
 
         try {
-            s = new AudioStream(new FileInputStream(Paths.get(resource.toURI()).toFile()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
+            DataLine.Info daInfo = new DataLine.Info(Clip.class, null);
+            try {
+
+
+                AudioInputStream inputStream = AudioSystem.getAudioInputStream(resource);
+                DataLine.Info info = new DataLine.Info(Clip.class, inputStream.getFormat());
+                Clip clip = (Clip) AudioSystem.getLine(info);
+                clip.open(inputStream);
+                clip.loop(Clip.LOOP_CONTINUOUSLY);
+                clip.start();
+            } catch (LineUnavailableException e) {
+                e.printStackTrace();
+            } catch (UnsupportedAudioFileException ex) {
+                ex.printStackTrace();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        } catch (Exception e) {
+            System.out.println("music");
         }
-        AudioData MD;
+
+
         AudioPlayer.player.start(s);
-        ///
 
-
-//
-//        add(table, c);
-//        teamName = new Label("");
-//        add(teamName, c);
-//        battleBtn = new Button("Battle");
-//        battleBtn.setEnabled(false);
-//        battleBtn.addActionListener(this::startBattle);
-//      add(battleBtn, c);
-//
-//        tour = new Button("Tournament");
-//        tour.addActionListener(this::startTournament);
-//       add(tour, c);
-//
-//        connectionStatus = new Label("Connected");
-//        add(connectionStatus, c);
-
-        UserStats[] stats = new UserStats[0];
-        try {
-            stats = client.getStats();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        for(UserStats stat : stats) {
-            data.addRow(new PlayerModel(stat.name, stat.lastpos, stat.score, stat.avgpos, stat.fighters));
-        }
         ScheduledExecutorService scheduler =
                 Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(this::updateConnectionStatus, 2, 2, TimeUnit.SECONDS);
@@ -299,15 +280,7 @@ private JLabel connectionStatus;
         }
     }
 
-    private void startBattle(ActionEvent event) {
-        try {
-            BattleInfo battleInfo = client.declareBattle(selectedPlayer);
-            new BattleController(battleInfo, frame);
-        }
-        catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
+
     public void paintComponent(Graphics g) {
         try {
             GraphicsEnvironment environment =
@@ -319,10 +292,8 @@ private JLabel connectionStatus;
             int screenHeight = dmode.getHeight();
             URL resource = ScreenController.class.getResource("/new.png");
           Image image = ImageIO.read(Paths.get(resource.toURI()).toFile());
-//            URL resource2 = ScreenController.class.getResource("/bg.png");
-//            Image bg = ImageIO.read(Paths.get(resource2.toURI()).toFile());
+
             g.drawImage(image,0,0,null);
-//            g.drawImage(image, 0,0, null);
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -335,7 +306,7 @@ private JLabel connectionStatus;
     private void updateConnectionStatus() {
 //TODO: Мб сделать только когда меняется значение чекКонекшена? И нужна ли эта строка вообще
          frame.repaint();
-       connectionStatus.setText(client.checkConnection() ? "Connected as " + client.name : "Disconnected");
+        connectionStatusLabel.setText(client.checkConnection() ? "Connected as " + client.name : "Disconnected");
     }
 
     private void disconnect(ActionEvent event){
@@ -348,4 +319,108 @@ private JLabel connectionStatus;
             e.printStackTrace();
         }
     }
+
+    private void selectOpponent(){
+
+    }
 }
+
+class SelectOpponentController extends JPanel{
+    JFrame frame;
+    Client client;
+    JPanel oldPanel;
+    private String selectedPlayer = null;
+    private PlayerTableModel data = new PlayerTableModel();
+    SelectOpponentController(JFrame frame, Client client){
+        this.frame = frame;
+      oldPanel = (JPanel) frame.getContentPane();
+        this.client = client;
+        frame.setPreferredSize(new Dimension(650,400));
+        frame.pack();
+        frame.setContentPane(this);
+       this.setPreferredSize(new Dimension(400,200));
+       JScrollPane jScrollPane2 = new javax.swing.JScrollPane();
+        JButton battleButton = new javax.swing.JButton();
+        JButton returnButton = new javax.swing.JButton();
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 659, Short.MAX_VALUE)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(returnButton)
+                                .addGap(216, 216, 216)
+                                .addComponent(battleButton, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 337, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(returnButton)
+                                        .addComponent(battleButton))
+                                .addContainerGap(17, Short.MAX_VALUE))
+        );
+        JTable jTable1 = new JTable(data);
+        jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent listSelectionEvent) {
+                int[] selectedRows = jTable1.getSelectedRows();
+                if (selectedRows.length == 0) {
+                    battleButton.setEnabled(false);
+                    return;
+                }
+                int i = selectedRows[0];
+                selectedPlayer = data.getRow(i).getName();
+                battleButton.setEnabled(!selectedPlayer.equals(client.name));
+                //  teamName.setText("Team " + selectedPlayer);
+                //TODO fill detailsList
+            }
+        });
+       jScrollPane2.setViewportView(jTable1);
+
+        battleButton.setText("Battle");
+        battleButton.setEnabled(false);
+        returnButton.setText("Return");
+        battleButton.addActionListener(this::startBattle);
+        returnButton.addActionListener(this::returnToMain);
+        UserStats[] stats = new UserStats[0];
+        try {
+            stats = client.getStats();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        for(UserStats stat : stats) {
+
+            data.addRow(new PlayerModel(stat.name, stat.lastpos, stat.score, stat.avgpos, stat.fighters));
+        }
+    }// </editor-fold>
+
+
+
+
+    private void startBattle(ActionEvent event) {
+        try {
+            BattleInfo battleInfo = client.declareBattle(selectedPlayer);
+            new BattleController(battleInfo, frame);
+        }
+        catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void returnToMain(ActionEvent event){
+
+        frame.setContentPane(oldPanel);
+        frame.setPreferredSize(new Dimension(800,530));
+        frame.pack();
+    }
+
+
+}
+
