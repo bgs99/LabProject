@@ -7,10 +7,13 @@ package bgs99c.lab2;
  * You should extend this with custom strategy for your player
  */
 public abstract class Strategy {
+public void observeResults(){
+throw new UnsupportedOperationException();
+}
 public Battle getBattle(){
 throw new UnsupportedOperationException();
 }
-public abstract Action makeTurn();
+public abstract Action makeTurn() throws Exception;
 public abstract void levelUp(Fighter f, int points);
 public abstract Fighter selectFighter(int left);
 public abstract Fighter replaceDead();

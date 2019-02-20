@@ -21,6 +21,7 @@ public abstract class Log implements Serializable{
     public LogId getPlayer() {
     	return owner;
     }
+
     static Log Fail(FighterInfo s, Player o){
         return new Log(LogType.FAIL, s, o) {static final long serialVersionUID = 42L;};
     }
@@ -30,6 +31,6 @@ public abstract class Log implements Serializable{
     }
 
     public enum LogType{
-        ATTACK, REPLACEMENT, DEATH, STUN, LASTING, SUPPORT, FAIL, TEAM
+        ATTACK, REPLACEMENT, DEATH, STUN, LASTING, SUPPORT, FAIL, TEAM, MESSAGE,
     }
 }

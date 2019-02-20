@@ -2,10 +2,12 @@ package JavaTournament;
 
 import bgs99c.client.*;
 import bgs99c.shared.UserStats;
+
+/* TODO: replace whith something cross-platform
 import sun.audio.AudioData;
 import sun.audio.AudioPlayer;
 import sun.audio.AudioStream;
-
+*/
 import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
 import javax.swing.*;
@@ -70,15 +72,15 @@ public class ScreenController {
 
 
 
-	
 
-	
+
+
 }
 
 
 class Background extends JPanel {
 
-    AudioStream s = null;
+    //AudioStream s = null;
     private JFrame frame;
     private Client client;
 
@@ -106,7 +108,7 @@ class Background extends JPanel {
        stat1Label = new JLabel();
        stat2Label = new JLabel();
         stat3Label = new JLabel();
-              youcanstartLabel = new JLabel();   
+              youcanstartLabel = new JLabel();
         Font CustomFont;
         Font customFont18 = null;
         try {
@@ -114,7 +116,7 @@ class Background extends JPanel {
             URL resource  = ScreenController.class.getResource("/beermoney.ttf");
             String TTFpath = Paths.get(resource.toURI()).toString();
             CustomFont = Font.createFont(Font.TRUETYPE_FONT, new FileInputStream(TTFpath));
-            customFont18 = CustomFont.deriveFont(16.0F); //11 шрифт
+            customFont18 = CustomFont.deriveFont(16.0F); //11 size
         }
         catch (FontFormatException e2) 	 {e2.printStackTrace();}
         catch (IOException e2) 			 {e2.printStackTrace();} catch (URISyntaxException e) {
@@ -261,7 +263,7 @@ class Background extends JPanel {
         }
 
 
-        AudioPlayer.player.start(s);
+        //AudioPlayer.player.start(s);
 
         ScheduledExecutorService scheduler =
                 Executors.newScheduledThreadPool(1);
@@ -304,7 +306,7 @@ class Background extends JPanel {
         }
     }
     private void updateConnectionStatus() {
-//TODO: Мб сделать только когда меняется значение чекКонекшена? И нужна ли эта строка вообще
+//TODO: mayby use only when setConnection changes or delete
          frame.repaint();
         connectionStatusLabel.setText(client.checkConnection() ? "Connected as " + client.name : "Disconnected");
     }
@@ -312,7 +314,7 @@ class Background extends JPanel {
     private void disconnect(ActionEvent event){
         try {
             client.close();
-            AudioPlayer.player.stop(s);
+            //AudioPlayer.player.stop(s);
             frame.dispose();
             MainController mainController = new MainController(frame);
         } catch (IOException e) {

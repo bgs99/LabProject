@@ -32,7 +32,9 @@ public class MainController extends JFrame{
         this.frame = frame;
 
 
-        //Костыль, у меня в Ubuntu почему-то Java считает что 2 экрана, потом потесчу на винде
+        //Stub, Ubuntu recognises 2 screens
+        //TODO: test on Windows
+
         GraphicsEnvironment environment =
                 GraphicsEnvironment.getLocalGraphicsEnvironment();
 

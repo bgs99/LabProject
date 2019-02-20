@@ -45,7 +45,7 @@ class DBManager {
 	}
 
 	byte getSalt(String name) {
-    	List<User> u = manager.createQuery("select u from User u").getResultList();
+    	List<User> u = manager.createQuery("select u from User u", User.class).getResultList();
     	return getUserByName(name).getSalt();
 	}
 

@@ -40,7 +40,7 @@ public abstract class FighterInfo {
     protected int typePoints = 0;
 
     
-    abstract Log applyPeriodicDamages(Player you);
+    abstract Log applyPeriodicDamages(Player you, OutputLogger logger);
     final boolean applyStuns() {
         if(stun <= 0) {
             return false;
@@ -49,14 +49,15 @@ public abstract class FighterInfo {
         return true;
     }
     final int getDebuff(){
-        return debuff;
+        return debuff - buff;
     }
     private int stun = 0;
     private int debuff = 0;
+    private int buff = 0;
     final void addStun(int time){
         stun = (stun > time) ? stun : time;
     }
-    abstract void addPeriodicDamage(int value);
+    abstract void addPeriodicDamage(int value, OutputLogger logger);
     public final String toString(){
         return this.getClass().getSimpleName() + " " + name;
     }
@@ -65,9 +66,15 @@ public abstract class FighterInfo {
      * @return current health
      */
     public abstract double getHealthBar();
-    abstract int applyDamage(int amount);
+    abstract int applyDamage(int amount, OutputLogger logger);
     abstract int getEvasion();
-    final void lowerStats(int amount){
+
+    final int increaseStats(int amount) {
+        buff = (buff > amount) ? buff : amount;
+        return buff;
+    }
+    final int lowerStats(int amount){
         debuff = (debuff > amount) ? debuff : amount;
+        return debuff;
     }
 }

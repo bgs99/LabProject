@@ -6,12 +6,13 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
 public final class Battle {
+    public OutputLogger logger;
     private Team teamA, teamB;
     private List<Log> log, turnLog;
     private Player currentPlayer;
     private final static int FIGHTERS = 3;
     private void markTurn() {
-    	OutputLogger.markTurn(turnLog);
+    	logger.markTurn(turnLog);
         turnLog = new ArrayList<>();
     }
     Player getCurrentPlayer(){
@@ -28,12 +29,22 @@ public final class Battle {
     		return teamB;
     	return null;
     }
+
+    private final boolean cheater;
+
+    public Battle(Player a, Player b){
+        this(a, b, new OutputLogger());
+    }
     /**
      * Creates a battle between given players
      * @param a First player
      * @param b Second player
      */
-    public Battle(Player a, Player b){
+    public Battle(Player a, Player b, OutputLogger logger){
+        this.logger = logger;
+        cheater = b.getName().equals("Cheater");
+        System.out.println(a + " vs " + b);
+
         teamA = new Team();
         teamA.player = a;
         teamB = new Team();
@@ -80,6 +91,7 @@ public final class Battle {
         }
     }
 
+    private boolean healed = false;
     /**
      * Runs battle simulation and returns the winner
      */
@@ -96,15 +108,16 @@ public final class Battle {
 
         Player winner = null;
 
+
         while(true){
             FutureTask<GameState> turn = new FutureTask<>(this::makeTurn);
             try {
                 turn.run();
                 current = turn.get(1, TimeUnit.SECONDS);
             }
-            catch(Exception | StackOverflowError| OutOfMemoryError e){
+            catch(Exception | StackOverflowError| OutOfMemoryError | OPError e){
                 e.printStackTrace();
-                OutputLogger.log("Exception in async");
+                logger.log("Exception in async");
                 winner = opponentInfo().player;
                 break;
             }
@@ -125,41 +138,70 @@ public final class Battle {
         return winner;
     }
 
-    private GameState makeTurn(){
-        GameState a = makeTurn(teamA);
+    private GameState makeTurn() throws Exception{
+        GameState a;
+        try {
+            a = makeTurn(teamA);
+            if(cheater && healed){
+                logger.log("Cheated!");
+            }
+        } catch (Exception e) {
+            if(e.getMessage().equals("Cheater!") && cheater && healed){
+                logger.log("You've catched the Cheater!");
+                markTurn();
+                return GameState.AWON;
+            }
+            throw e;
+        }
         markTurn();
         if(a == GameState.BWON) {
             return a;
         }
+
+        healed = false;
+
         GameState res = makeTurn(teamB);
         markTurn();
         return res;
     }
-    private GameState makeTurn(Team team){
+    private GameState makeTurn(Team team) throws Exception{
+
         currentPlayer = team.player;
-        Log pd = team.current.applyPeriodicDamages(currentPlayer);
-        record(pd);
-        
+
+        Log periodicDamages = team.current.applyPeriodicDamages(currentPlayer, logger);
+        record(periodicDamages);
+
+
         if(team.current.getHealth()<=0){
+            logger.message(team.current.dyingMessage(opponentFighter()), team.current, team.player);
         	record(new DeathLog(team.current, currentPlayer));
-            OutputLogger.log(team.current + " is dead");
-            team.alive--;
-            opponentInfo().player.getStrategy().applyLevelUp(opponentFighter());
-            if(team.alive <=0){
-                OutputLogger.log(opponentInfo().player + " won!");
+
+        	logger.log(team.current + " is dead");
+
+        	team.alive--;
+
+            opponentInfo().player.getStrategy().applyLevelUp(opponentFighter(), logger);
+
+            if(team.alive <= 0){
+                logger.log(opponentInfo().player + " won!");
                 return opponentInfo().winState;
             }
-            while(team.current.getHealth()<=0){
+
+            while(team.current.getHealth() <= 0){
             	FighterInfo last = team.current;
                 team.current = team.player.getStrategy().replaceDead();
+                logger.message(team.current.enterFightMessage(), team.current, team.player);
                 ReplacementLog rl = new ReplacementLog(last, team.current, currentPlayer);
                 record(rl);
             }
-            OutputLogger.log(team.current + " replaced his fallen ally.");
+
+            logger.log(team.current + " replaced his fallen ally.");
         }
         if(!team.current.applyStuns()) {
             Action a = team.player.getStrategy().makeTurn();
-            record(a.apply(this));
+            Log result = a.apply(this);
+            record(result);
+            healed = result instanceof AttackLog && ((AttackLog) result).getResult().heal > 0;
         }
         return GameState.NORMAL;
     }
@@ -228,11 +270,11 @@ public final class Battle {
                 squad = player.fighters;
             }
             else{
-                for(int i = FIGHTERS; i>0;i--) {
+                for(int i = FIGHTERS; i > 0; i--) {
                     Fighter x = player.getStrategy().selectFighterTournament(i);
                     if(x == null)
                         return false;
-                    OutputLogger.log(player + " selected " + x);
+                    logger.log(player + " selected " + x);
                     squad[FIGHTERS-i] = x;
                 }
             }
@@ -240,12 +282,13 @@ public final class Battle {
             player.fought = true;
             alive = FIGHTERS;
             current = squad[0];
+            logger.message(current.enterFightMessage(), current, player);
             List<Log> logs = new ArrayList<>();
             for(Fighter f : squad){
                 f.reset();
                 logs.add(new TeamLog(f, player));
             }
-            OutputLogger.markTurn(logs);
+            logger.markTurn(logs);
             return true;
         }
     }

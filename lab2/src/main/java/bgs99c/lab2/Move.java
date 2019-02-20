@@ -18,8 +18,7 @@ public abstract class Move implements Action{
     }
     final boolean checkPoints(int amount){
         if(pointsLeft() < amount){
-            OutputLogger.log(this.getClass().getSimpleName() + " is too powerful");
-            return false;
+            throw new OPError();
         }
         return true;
     }

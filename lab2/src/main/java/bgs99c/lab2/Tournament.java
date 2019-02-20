@@ -12,9 +12,9 @@ public final class Tournament {
      * Creates tournament with given contestants
      * @param c Contestants. Should not be empty
      */
-	
+	public OutputLogger logger = new OutputLogger();
     public Tournament(Player[] c){
-    	OutputLogger.log("Tournament started!");
+    	logger.log("Tournament started!");
         contestants = new LinkedList<>();
         Collections.addAll(contestants, c);
     }
@@ -33,10 +33,10 @@ public final class Tournament {
             	return res;
             }
             Player b = contestants.poll();
-            Battle f = new Battle(a, b);
+            Battle f = new Battle(a, b, logger);
             Player winner = f.start();
             FutureTask<Boolean> evolve = new FutureTask<>(() -> {
-                winner.getStrategy().applyEvolve(winner);
+                winner.getStrategy().applyEvolve(winner, logger);
                 return true;
             });
             evolve.run();
