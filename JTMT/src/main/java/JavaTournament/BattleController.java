@@ -562,6 +562,7 @@ stat1_3 = new javax.swing.JLabel();
 		//logDisplay.setText(res.get(turn).msgs.toString());
 		if(turn == res.size() - 1) {
 			skipButton.setEnabled(false);
+			stepButton.setEnabled(false);
 			String winner;
 			if(players.get(0).equals(ranks.get(battle))) {
 				players.remove(0);
@@ -630,15 +631,20 @@ stat1_3 = new javax.swing.JLabel();
 
 		for(LogId li : team.keySet()) {
 			stats.add(li);
+
 //						MultiLabel name = new MultiLabel(li.name);
 //			MultiLabel health = new MultiLabel("" + team.get(li).health + "/" + team.get(li).maxhealth);
 //			Box hb = Box.createHorizontalBox();
 //			hb.add(name);
-//			hb.add(Box.createHorizontalStrut(20));
+//			hb.add(Box.createHorizontalStrut(20));vs
 //			hb.add(health);
 //			res.add(hb);
 		}
 		if(stats.size()>0) {
+		for(int i = 0 ; i < stats.size(); i++){
+			System.out.println(stats.get(i).name);
+		}
+
 			pokemon1.setText(stats.get(0).name);
 			if (stats.size() > 1)
 				pokemon2.setText(stats.get(1).name);

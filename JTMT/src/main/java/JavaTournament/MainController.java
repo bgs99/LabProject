@@ -42,7 +42,7 @@ public class MainController extends JFrame{
             int screenHeight = dmode.getHeight();
 
 
-        frame.setPreferredSize(new Dimension(LOGINPAGE_WIDTH, LOGINPAGE_HEIGHT));
+        //frame.setPreferredSize(new Dimension(LOGINPAGE_WIDTH, LOGINPAGE_HEIGHT));
         Dimension screenSize = new Dimension(screenWidth, screenHeight);
         Point middle = new Point(screenSize.width / 2, screenSize.height / 2);
         Point newLocation = new Point(middle.x - ( LOGINPAGE_WIDTH / 2),
@@ -69,6 +69,8 @@ public class MainController extends JFrame{
 
 
 class LoginPanel extends JPanel implements KeyListener {
+    private final int LOGINPAGE_HEIGHT = 130;
+    private final int LOGINPAGE_WIDTH = 260;
     JFrame frame;
     Client client;
     JLabel passwordLabel = new javax.swing.JLabel();
@@ -81,7 +83,7 @@ class LoginPanel extends JPanel implements KeyListener {
       LoginPanel(JFrame frame, Client client) {
           this.frame = frame;
           this.client = client;
-
+          setPreferredSize(new Dimension(LOGINPAGE_WIDTH, LOGINPAGE_HEIGHT));
         passwordLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         passwordLabel.setText("Password");
 
