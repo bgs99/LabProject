@@ -2,13 +2,11 @@ package JavaTournament;
 
 import bgs99c.client.*;
 import bgs99c.shared.UserStats;
-import sun.audio.AudioData;
-import sun.audio.AudioPlayer;
-import sun.audio.AudioStream;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
 import javax.swing.*;
+import javax.sound.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
@@ -32,14 +30,14 @@ import static java.awt.GridBagConstraints.*;
 
 
 public class ScreenController {
+    private final int LOGINPAGE_HEIGHT = 530;
+    private final int LOGINPAGE_WIDTH = 800;
 
     private Client client;
     private JFrame frame;
     private Label teamName;
     private Button tour;
     private Button battleBtn;
-    private final int LOGINPAGE_HEIGHT = 530;
-    private final int LOGINPAGE_WIDTH = 800;
 
 	ScreenController(Client client, JFrame frame) throws URISyntaxException {
 		this.client = client;
@@ -53,16 +51,16 @@ public class ScreenController {
             int screenHeight = dmode.getHeight();
 
 
-        frame.setPreferredSize(new Dimension(LOGINPAGE_WIDTH, LOGINPAGE_HEIGHT));
         Dimension screenSize = new Dimension(screenWidth, screenHeight);
         Point middle = new Point(screenSize.width / 2, screenSize.height / 2);
         Point newLocation = new Point(middle.x - ( LOGINPAGE_WIDTH / 2),
                 middle.y - (LOGINPAGE_HEIGHT / 2 ) );
         frame.setLocation(newLocation);
+      //  frame.setContentPane(panel1);
+        frame.add(panel1);
         frame.setContentPane(panel1);
+       // frame.setPreferredSize(new Dimension(LOGINPAGE_WIDTH, 500));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-
         frame.pack();
         frame.setVisible(true);
 
@@ -77,8 +75,9 @@ public class ScreenController {
 
 
 class Background extends JPanel {
+    private final int LOGINPAGE_HEIGHT = 530;
+    private final int LOGINPAGE_WIDTH = 800;
 
-    AudioStream s = null;
     private JFrame frame;
     private Client client;
 
@@ -91,7 +90,9 @@ class Background extends JPanel {
     JLabel stat1Label;
     JLabel stat2Label;
     JLabel stat3Label ;
+
     JLabel youcanstartLabel;
+    Clip clip;
     public Background (Client client, JFrame frame) {
         this.frame = frame;
         this.client = client;
@@ -245,7 +246,7 @@ class Background extends JPanel {
 
                 AudioInputStream inputStream = AudioSystem.getAudioInputStream(resource);
                 DataLine.Info info = new DataLine.Info(Clip.class, inputStream.getFormat());
-                Clip clip = (Clip) AudioSystem.getLine(info);
+                clip = (Clip) AudioSystem.getLine(info);
                 clip.open(inputStream);
                 clip.loop(Clip.LOOP_CONTINUOUSLY);
                 clip.start();
@@ -260,8 +261,8 @@ class Background extends JPanel {
             System.out.println("music");
         }
 
+        setPreferredSize(new Dimension(LOGINPAGE_WIDTH, LOGINPAGE_HEIGHT));
 
-        AudioPlayer.player.start(s);
 
         ScheduledExecutorService scheduler =
                 Executors.newScheduledThreadPool(1);
@@ -312,7 +313,7 @@ class Background extends JPanel {
     private void disconnect(ActionEvent event){
         try {
             client.close();
-            AudioPlayer.player.stop(s);
+            clip.stop();
             frame.dispose();
             MainController mainController = new MainController(frame);
         } catch (IOException e) {
@@ -335,10 +336,11 @@ class SelectOpponentController extends JPanel{
         this.frame = frame;
       oldPanel = (JPanel) frame.getContentPane();
         this.client = client;
-        frame.setPreferredSize(new Dimension(650,400));
-        frame.pack();
+
+      setPreferredSize(new Dimension(420,400));
         frame.setContentPane(this);
-       this.setPreferredSize(new Dimension(400,200));
+
+        frame.pack();
        JScrollPane jScrollPane2 = new javax.swing.JScrollPane();
         JButton battleButton = new javax.swing.JButton();
         JButton returnButton = new javax.swing.JButton();
@@ -417,7 +419,7 @@ class SelectOpponentController extends JPanel{
     private void returnToMain(ActionEvent event){
 
         frame.setContentPane(oldPanel);
-        frame.setPreferredSize(new Dimension(800,530));
+  //      frame.setPreferredSize(new Dimension(800,530));
         frame.pack();
     }
 
