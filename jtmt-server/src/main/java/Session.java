@@ -101,9 +101,8 @@ public final class Session implements Closeable, Runnable{
 		dbManager.recordTournament(ranks);
 		oos.writeObject(Game.getPlayers());
 		oos.writeObject(ranks);
-		oos.writeObject(Game.getLogs());
+		oos.writeObject(Game.logs);
 		oos.flush();
-		Game.clearLogs();
 	}
 
 	private synchronized void makeBattle(String opponent) throws IOException, SQLException {
@@ -116,9 +115,8 @@ public final class Session implements Closeable, Runnable{
 		rs.add(name.equals(winner)? opponent : winner);
 		rs.add(winner);
 		oos.writeObject(rs);
-		oos.writeObject(Game.getLogs());
+		oos.writeObject(Game.logs);
 		oos.flush();
-		Game.clearLogs();
 	}
 
 	@Override

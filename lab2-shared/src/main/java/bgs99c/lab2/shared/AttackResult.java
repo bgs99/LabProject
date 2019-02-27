@@ -4,38 +4,20 @@ import java.io.Serializable;
 
 public class AttackResult implements Serializable{
 	static final long serialVersionUID = 42L;
-    private final int damage;
-    private final int stats;
-    private final int leech;
-    private final int stun;
-    private final int periodic;
+    public final int damage;
+    public final int debuff;
+    public final int buff;
+    public final int heal;
+    public final int stun;
+    public final int periodic;
 
-    public AttackResult(int damage, int stats, int leech, int stun, int periodic){
-
+    public AttackResult(int damage, int debuff, int stun, int periodic, int heal, int buff){
+        this.heal = heal;
         this.damage = damage;
-        this.stats = stats;
-        this.leech = leech;
+        this.debuff = debuff;
         this.stun = stun;
         this.periodic = periodic;
+        this.buff = buff;
     }
 
-    public int getDamage() {
-        return damage;
-    }
-
-    public int getStats() {
-        return stats;
-    }
-
-    public int getLeech() {
-        return leech;
-    }
-
-    public int getStun() {
-        return stun;
-    }
-
-    public int getPeriodic() {
-        return periodic;
-    }
 }

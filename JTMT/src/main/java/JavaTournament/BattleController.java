@@ -8,13 +8,8 @@ import java.util.*;
 import java.util.List;
 
 import bgs99c.client.*;
-import bgs99c.lab2.AttackLog;
-import bgs99c.lab2.DeathLog;
-import bgs99c.lab2.Log;
-import bgs99c.lab2.PeriodicDamageLog;
-import bgs99c.lab2.Record;
-import bgs99c.lab2.ReplacementLog;
-import bgs99c.lab2.TeamLog;
+import bgs99c.lab2.*;
+import bgs99c.lab2.shared.AttackResult;
 import bgs99c.lab2.shared.FighterStats;
 import bgs99c.lab2.shared.LogId;
 
@@ -483,7 +478,7 @@ stat1_3 = new javax.swing.JLabel();
 
         updatePlayers();
 
-        
+
 	}
 	private void turn(ActionEvent event) {
 		turn++;
@@ -525,12 +520,19 @@ stat1_3 = new javax.swing.JLabel();
 					break;
 				case ATTACK:
 					AttackLog al = (AttackLog)l;
-					if(al.getResult().getDamage() == 0)
-						break;
-					oteam.get(al.getSubject()).health -= al.getResult().getDamage();
+					AttackResult ar = al.getResult();
 
-					//damageAnimation(al.getResult().getDamage(), l.getPlayer().equals(apid) ? bDamage : aDamage);
-					updateFighters(oteam);
+					oteam.get(al.getSubject()).health -= ar.damage;
+					team.get(al.getUser()).health += ar.heal;
+
+					if (ar.damage > 0) {
+						//damageAnimation(al.getResult().damage, l.getPlayer().equals(apid) ? bDamage : aDamage);
+						updateFighters(oteam);
+					}
+					if (ar.heal > 0) {
+						//TODO: heal animation
+						updateFighters(team);
+					}
 					break;
 				case DEATH:
 					DeathLog dl = (DeathLog)l;
@@ -543,8 +545,11 @@ stat1_3 = new javax.swing.JLabel();
 					else curB = team.get(rl.getReplacement());
 					updateFighters(team);
 					break;
+				case MESSAGE:
+					MessageLog ml = (MessageLog) l;
+					System.out.println(ml.getSubject().name + " said: \""+ml.message + "\"");
 				default:
-					System.out.println(logs.get(0).getType());
+					System.out.println();
 			}
 		}
 		LogId p = logs.get(0).getPlayer();
@@ -585,9 +590,9 @@ stat1_3 = new javax.swing.JLabel();
 		while(turn != res.size() - 1){
 			turn(event);
 		}
-			
+
 	}
-	
+
 //
 //
 //	private void damageAnimation(int amount, MultiLabel target) {

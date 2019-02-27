@@ -2,11 +2,9 @@ package JavaTournament;
 
 import bgs99c.client.*;
 import bgs99c.shared.UserStats;
-
 import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
 import javax.swing.*;
-import javax.sound.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
@@ -32,23 +30,21 @@ import static java.awt.GridBagConstraints.*;
 public class ScreenController {
     private final int LOGINPAGE_HEIGHT = 530;
     private final int LOGINPAGE_WIDTH = 800;
-
     private Client client;
     private JFrame frame;
     private Label teamName;
     private Button tour;
     private Button battleBtn;
-
-	ScreenController(Client client, JFrame frame) throws URISyntaxException {
-		this.client = client;
-		this.frame = frame;
+    ScreenController(Client client, JFrame frame) throws URISyntaxException {
+        this.client = client;
+        this.frame = frame;
         Background panel1 = new Background(client, frame);
         GraphicsEnvironment environment =
                 GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice[] devices = environment.getScreenDevices();
-            DisplayMode dmode = devices[0].getDisplayMode();
-            int screenWidth = dmode.getWidth();
-            int screenHeight = dmode.getHeight();
+        DisplayMode dmode = devices[0].getDisplayMode();
+        int screenWidth = dmode.getWidth();
+        int screenHeight = dmode.getHeight();
 
 
         Dimension screenSize = new Dimension(screenWidth, screenHeight);
@@ -56,15 +52,15 @@ public class ScreenController {
         Point newLocation = new Point(middle.x - ( LOGINPAGE_WIDTH / 2),
                 middle.y - (LOGINPAGE_HEIGHT / 2 ) );
         frame.setLocation(newLocation);
-      //  frame.setContentPane(panel1);
+        //  frame.setContentPane(panel1);
         frame.add(panel1);
         frame.setContentPane(panel1);
-       // frame.setPreferredSize(new Dimension(LOGINPAGE_WIDTH, 500));
+        // frame.setPreferredSize(new Dimension(LOGINPAGE_WIDTH, 500));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
 
-      	}
+    }
 
 
 
@@ -90,7 +86,6 @@ class Background extends JPanel {
     JLabel stat1Label;
     JLabel stat2Label;
     JLabel stat3Label ;
-
     JLabel youcanstartLabel;
     Clip clip;
     public Background (Client client, JFrame frame) {
@@ -305,7 +300,7 @@ class Background extends JPanel {
         }
     }
     private void updateConnectionStatus() {
-//TODO: Мб сделать только когда меняется значение чекКонекшена? И нужна ли эта строка вообще
+//TODO: mayby use only when setConnection changes or delete
          frame.repaint();
         connectionStatusLabel.setText(client.checkConnection() ? "Connected as " + client.name : "Disconnected");
     }
@@ -334,14 +329,12 @@ class SelectOpponentController extends JPanel{
     private PlayerTableModel data = new PlayerTableModel();
     SelectOpponentController(JFrame frame, Client client){
         this.frame = frame;
-      oldPanel = (JPanel) frame.getContentPane();
+        oldPanel = (JPanel) frame.getContentPane();
         this.client = client;
-
-      setPreferredSize(new Dimension(420,400));
+        setPreferredSize(new Dimension(420,400));
         frame.setContentPane(this);
-
         frame.pack();
-       JScrollPane jScrollPane2 = new javax.swing.JScrollPane();
+        JScrollPane jScrollPane2 = new javax.swing.JScrollPane();
         JButton battleButton = new javax.swing.JButton();
         JButton returnButton = new javax.swing.JButton();
 
@@ -419,7 +412,7 @@ class SelectOpponentController extends JPanel{
     private void returnToMain(ActionEvent event){
 
         frame.setContentPane(oldPanel);
-  //      frame.setPreferredSize(new Dimension(800,530));
+      //  frame.setPreferredSize(new Dimension(800,530));
         frame.pack();
     }
 

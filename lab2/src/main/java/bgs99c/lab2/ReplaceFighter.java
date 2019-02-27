@@ -16,11 +16,11 @@ public final class ReplaceFighter implements Action{
     }
     public Log apply(Battle b){
         if (!Arrays.asList(b.allySquad()).contains(fighter)) {
-            OutputLogger.log(b.currentFighter() + " is asking for replacement, but " + fighter + " is not around");
+            b.logger.log(b.currentFighter() + " is asking for replacement, but " + fighter + " is not around");
             return Log.Fail(b.currentFighter(), b.getCurrentPlayer());
         }
         Fighter original = b.currentFighter();
-        OutputLogger.log(original + " is replaced by " + fighter);
+        b.logger.log(original + " is replaced by " + fighter);
         b.changeFighter(fighter);
         return new ReplacementLog(original, fighter, b.getCurrentPlayer());
     }
