@@ -9,58 +9,34 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
-import static java.awt.GridBagConstraints.BOTH;
-import static java.awt.GridBagConstraints.RELATIVE;
-import static java.awt.GridBagConstraints.WEST;
+
+
+
 
 public class MainController extends JFrame{
-    private JTextField login;
-    private JPasswordField password;
-    private final int LOGINPAGE_HEIGHT = 160;
-    private final int LOGINPAGE_WIDTH = 260;
-    private Client client = new Client();
-    private JFrame frame;
+
 
     MainController(JFrame frame) {
-        this.frame = frame;
-
-
-        //Stub, Ubuntu recognises 2 screens
-        //TODO: test on Windows
-
-        GraphicsEnvironment environment =
-                GraphicsEnvironment.getLocalGraphicsEnvironment();
-
-        GraphicsDevice[] devices = environment.getScreenDevices();
-            DisplayMode dmode = devices[0].getDisplayMode();
-            int screenWidth = dmode.getWidth();
-            int screenHeight = dmode.getHeight();
-
-
-        //frame.setPreferredSize(new Dimension(LOGINPAGE_WIDTH, LOGINPAGE_HEIGHT));
-        Dimension screenSize = new Dimension(screenWidth, screenHeight);
-        Point middle = new Point(screenSize.width / 2, screenSize.height / 2);
-        Point newLocation = new Point(middle.x - ( LOGINPAGE_WIDTH / 2),
-                middle.y - (LOGINPAGE_HEIGHT / 2 ) );
-
+        Client client = new Client();
         LoginPanel panel = new LoginPanel(frame, client);
-
-
+        frame.setResizable(false);
         frame.setContentPane(panel);
-        frame.setLocation(newLocation);
-        frame.setVisible(true);
+        frame.setLocation(ScreenUtil.getCenterPoint(ScreenUtil.LOGIN_PAGE_SIZE));
         frame.pack();
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         panel.setFocusable(true);
         panel.requestFocusInWindow();
 
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
 
 
 
@@ -71,120 +47,139 @@ public class MainController extends JFrame{
 
 
 class LoginPanel extends JPanel implements KeyListener {
-    private final int LOGINPAGE_HEIGHT = 130;
-    private final int LOGINPAGE_WIDTH = 260;
-    JFrame frame;
-    Client client;
-    JLabel passwordLabel = new javax.swing.JLabel();
-    JLabel  loginLabel = new javax.swing.JLabel();
-    JTextField loginTextField = new javax.swing.JTextField();
-    JPasswordField passwordField = new javax.swing.JPasswordField();
-    JLabel  logoLabel = new javax.swing.JLabel();
-    JButton loginButton = new JButton();
 
-      LoginPanel(JFrame frame, Client client) {
-          this.frame = frame;
-          this.client = client;
-          setPreferredSize(new Dimension(LOGINPAGE_WIDTH, LOGINPAGE_HEIGHT));
-        passwordLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+    private JFrame frame;
+    private Client client;
+    private JTextField loginTextField = new JTextField();
+    private  JPasswordField passwordField = new JPasswordField();
+
+    LoginPanel(JFrame frame, Client client) {
+        this.frame = frame;
+        this.client = client;
+        setPreferredSize(ScreenUtil.LOGIN_PAGE_SIZE);
+
+        Font CustomFont;
+        Font customFont18 = null;
+        try {
+
+            URL resource  = ScreenController.class.getResource("/beermoney.ttf");
+            String TTFpath = Paths.get(resource.toURI()).toString();
+            CustomFont = Font.createFont(Font.TRUETYPE_FONT, new FileInputStream(TTFpath));
+            customFont18 = CustomFont.deriveFont(19.0F); //11 шрифт
+
+        }
+        catch (FontFormatException | IOException | URISyntaxException e2) 	 {e2.printStackTrace();}
+
+        JLabel passwordLabel = new JLabel();
+        passwordLabel.setHorizontalAlignment(SwingConstants.LEFT);
         passwordLabel.setText("Password");
-
-        loginLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        passwordLabel.setForeground(new Color(209,202,202));
+        passwordLabel.setFont(customFont18);
+        JLabel loginLabel = new JLabel();
+        loginLabel.setHorizontalAlignment(SwingConstants.LEFT);
         loginLabel.setText("Login");
+        loginLabel.setForeground(new Color(209,202,202));
+        loginLabel.setFont(customFont18);
 
+        JButton loginButton = new JButton();
         loginButton.setText("Login");
-          loginButton.setBackground(new java.awt.Color(128, 0, 0));
-          loginButton.setFont(new java.awt.Font("Algerian", 0, 11));
-          loginButton.setForeground(new java.awt.Color(255, 248, 220));
+        loginButton.setBackground(new Color(128, 12, 12));
+        loginButton.setFont(customFont18);
+        loginButton.setForeground(new Color(209,209,202));
         loginButton.addKeyListener(this);
 
         loginTextField.setText("");
 
         passwordField.setText("");
 
-        logoLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-          logoLabel.setText("ITMOnsters");
-          logoLabel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        JLabel logoLabel = new JLabel();
+        logoLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        logoLabel.setText("ITMOnsters");
+        logoLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+        logoLabel.setFont(customFont18);
+        logoLabel.setForeground(new Color(209,209,202));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+
+
+        GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
-          layout.setHorizontalGroup(
-                  layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                          .addComponent(logoLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                          .addGroup(layout.createSequentialGroup()
-                                  .addContainerGap()
-                                  .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                          .addGroup(layout.createSequentialGroup()
-                                                  .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                                          .addComponent(loginLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                          .addComponent(passwordLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                  .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                                          .addComponent(passwordField)
-                                                          .addComponent(loginTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                          .addComponent(loginButton, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                  .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-          );
-          layout.setVerticalGroup(
-                  layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                          .addGroup(layout.createSequentialGroup()
-                                  .addComponent(logoLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                  .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                          .addComponent(loginLabel)
-                                          .addComponent(loginTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                  .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                          .addComponent(passwordLabel)
-                                          .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                  .addComponent(loginButton)
-                                  .addContainerGap())
-          );
-          loginButton.addActionListener(q -> submit());
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(logoLabel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                                        .addComponent(loginLabel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(passwordLabel, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE))
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                                        .addComponent(passwordField)
+                                                        .addComponent(loginTextField, GroupLayout.PREFERRED_SIZE, 143, GroupLayout.PREFERRED_SIZE)))
+                                        .addComponent(loginButton, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(logoLabel, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(loginLabel)
+                                        .addComponent(loginTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(passwordLabel)
+                                        .addComponent(passwordField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(loginButton)
+                                .addContainerGap())
+        );
+        loginButton.addActionListener(q -> submit());
 
-          frame.addWindowListener(new WindowListener() {
-              @Override
-              public void windowOpened(WindowEvent windowEvent) {
+        frame.addWindowListener(new WindowListener() {
+            @Override
+            public void windowOpened(WindowEvent windowEvent) {
 
-              }
+            }
 
-              @Override
-              public void windowClosing(WindowEvent windowEvent) {
-                  try {
-                      client.close();
-                  } catch (IOException e) {
-                      e.printStackTrace();
-                  }
-              }
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+                try {
+                    client.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
 
-              @Override
-              public void windowClosed(WindowEvent windowEvent) {
+            @Override
+            public void windowClosed(WindowEvent windowEvent) {
 
-              }
+            }
 
-              @Override
-              public void windowIconified(WindowEvent windowEvent) {
+            @Override
+            public void windowIconified(WindowEvent windowEvent) {
 
-              }
+            }
 
-              @Override
-              public void windowDeiconified(WindowEvent windowEvent) {
+            @Override
+            public void windowDeiconified(WindowEvent windowEvent) {
 
-              }
+            }
 
-              @Override
-              public void windowActivated(WindowEvent windowEvent) {
+            @Override
+            public void windowActivated(WindowEvent windowEvent) {
 
-              }
+            }
 
-              @Override
-              public void windowDeactivated(WindowEvent windowEvent) {
+            @Override
+            public void windowDeactivated(WindowEvent windowEvent) {
 
-              }
-          });
+            }
+        });
 
-      }
+    }
 
 
     private void submit() {
@@ -230,26 +225,17 @@ class LoginPanel extends JPanel implements KeyListener {
     }
     public void paintComponent(Graphics g) {
         try {
-            GraphicsEnvironment environment =
-                    GraphicsEnvironment.getLocalGraphicsEnvironment();
 
-            GraphicsDevice[] devices = environment.getScreenDevices();
-            DisplayMode dmode = devices[0].getDisplayMode();
-            int screenWidth = dmode.getWidth();
-            int screenHeight = dmode.getHeight();
             URL resource = ScreenController.class.getResource("/bg.png");
             Image image = ImageIO.read(Paths.get(resource.toURI()).toFile());
 
             g.drawImage(image,0,0,null);
 
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
+        } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }
     }
 }
+
 
 
