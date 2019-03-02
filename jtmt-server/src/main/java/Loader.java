@@ -21,6 +21,7 @@ public class Loader {
 	private static Map<String, URLClassLoader> classLoaders = new HashMap<String, URLClassLoader>();
 	
 	public static List<FighterStats> teamInfo(String name){
+		System.out.println("Loading team info...");
 		List<FighterStats> res = new ArrayList<>();
 		try {
 			URLClassLoader cl = classLoaders.get(name+".jar");
@@ -60,6 +61,7 @@ public class Loader {
 				fs.types = b.getTypes();
 				res.add(fs);
 			}
+			System.out.println("Team info loaded");
 		} catch(Exception e) {
 			System.out.println("Can't get fighter info of " + name);
 		}

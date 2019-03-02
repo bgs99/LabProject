@@ -3,6 +3,7 @@ package models;
 import bgs99c.shared.Security;
 
 import javax.persistence.*;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -42,9 +43,19 @@ public class User {
     }
 
     public int lastScore() {
-        return tournaments.stream().sorted()
+        if (tournaments == null)
+            return -1;
+
+        Tournament[] t = tournaments.stream().toArray(Tournament[]::new);
+        if (t.length < 1)
+            return -1;
+
+        Arrays.sort(t, Comparator.comparing(Tournament::getDate));
+        return t[t.length - 1].getPosition();
+
+        /*return tournaments.stream().sorted()
                .max(Comparator.comparing(Tournament::getDate))
-               .map(Tournament::getPosition).orElse(-1);
+               .map(Tournament::getPosition).orElse(-1);*/
     }
 
     public double averageScore() {

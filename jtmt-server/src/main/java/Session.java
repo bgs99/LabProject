@@ -1,10 +1,4 @@
-import java.io.Closeable;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -149,10 +143,13 @@ public final class Session implements Closeable, Runnable{
 
 			System.out.println("User " + name + " logged in");
 			UserStats[] users = dbManager.getUsers();
+			System.out.println("Got users");
 			game = new Game(users);
-			
+			System.out.println("Created game.");
+
 			while (true) {
 				Protocol action = Protocol.fromInt(ois.read());
+                System.out.println("Received action: " + action);
 				switch (action) {
 					case STATS:
 						users = dbManager.getUsers();

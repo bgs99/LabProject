@@ -102,17 +102,22 @@ public class Client implements Closeable {
 	}
 
 	public UserStats[] getStats() throws IOException, ClassNotFoundException {
+		System.out.println("Requesting stats...");
 		lock.lock();
 		try {
 			useProtocol(Protocol.STATS);
+			System.out.println("Sent protocol id");
 			int len = ois.read();
+			System.out.println("Read stat count");
 			UserStats[] res = new UserStats[len];
 			for(int i = 0; i < len; i++) {
 				res[i] = (UserStats) ois.readObject();
 			}
+			System.out.println("Done reading stats");
 			return res;
 		} finally {
 			lock.unlock();
+			System.out.println("Unlocked");
 		}
 	}
 

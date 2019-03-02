@@ -22,8 +22,17 @@ class DBManager {
 	}
 
 	UserStats[] getUsers() {
+    	System.out.println("getUsers() called");
 		Stream<User> st = manager.createNamedQuery("User.findAll", User.class).getResultStream();
-		
+		System.out.println("Created named query.");
+
+		/*return st.map(q -> new UserStats(
+				q.getName(),
+				q.lastScore(),
+				1,
+				0,
+				Loader.teamInfo(q.getName())
+		)).toArray(UserStats[]::new);*/
 		return st.map(q -> new UserStats(
                         q.getName(),
                         q.lastScore(),
