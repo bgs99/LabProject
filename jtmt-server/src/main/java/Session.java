@@ -71,8 +71,17 @@ public final class Session implements Closeable, Runnable{
 	}
 	
 	public void readFile(String fileName) throws IOException {
+	    final long MAX_FILE_SIZE = 16 * 1024 * 1024; // 16 MiB. Maybe move to config?
+
         OutputStream output = new FileOutputStream(Loader.PD + fileName);   
-        long size = ois.readLong();   
+        long size = ois.readLong();
+        if (size > MAX_FILE_SIZE) {
+            skipFile(size);
+            output.close();
+            //TODO: maybe notify client about it?
+            return;
+        }
+
         byte[] buffer = new byte[1024];   
         int bytesRead;
 		while (size > 0 && (bytesRead = ois.read(buffer, 0, (int)Math.min(buffer.length, size))) != -1)   
@@ -84,6 +93,18 @@ public final class Session implements Closeable, Runnable{
         Loader.load(fileName);
         Game.updatePlayer(fileName.substring(0, fileName.indexOf('.')));
 	}
+
+	private void skipFile(long size) {
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+        try {
+            while (size > 0 && (bytesRead = ois.read(buffer, 0, (int) Math.min(buffer.length, size))) != -1)
+                size -= bytesRead;
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 	
 	private void acceptFeedback() throws IOException {
 		System.out.println("*** " + ois.readUTF());
