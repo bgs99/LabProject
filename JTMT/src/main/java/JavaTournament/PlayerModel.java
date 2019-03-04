@@ -2,7 +2,7 @@ package JavaTournament;
 
 import java.util.List;
 
-import bgs99c.shared.FighterStats;
+import bgs99c.lab2.shared.FighterStats;
 
 public class PlayerModel{
 	private String[] columnNames = new String []{"Name", "Rank", "Score", "Avg. rank"};

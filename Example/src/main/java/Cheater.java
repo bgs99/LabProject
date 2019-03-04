@@ -55,15 +55,15 @@ class Hacker extends Fighter{
         addMove(new Punch());
         addMove(new Hack());
         increaseStat(5, Stats.DEFENCE);
-        increaseStat(5, Stats.POWER);
+        increaseStat(5, Stats.ATTACK);
         increaseStat(5, Stats.HEALTH);
-        increaseStat(5, Stats.EVASION);
+        increaseStat(5, Stats.SPEED);
     }
 }
 
 class Hack extends Attack{
     Hack() {
-        super(Types.BUG);
+        super(Types.BUG, false);
         addEffect(new Effect(EffectType.HEAL, 5));
     }
 

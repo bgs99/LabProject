@@ -13,7 +13,7 @@ import java.util.jar.JarInputStream;
 import java.util.stream.Stream;
 
 import bgs99c.lab2.Player;
-import bgs99c.shared.FighterStats;
+import bgs99c.lab2.shared.FighterStats;
 import bgs99c.lab2.Fighter;
 
 
@@ -50,15 +50,7 @@ public class Loader {
 				Constructor<?> constructor = c.getDeclaredConstructor();
 				constructor.setAccessible(true);
 				Fighter b = (Fighter)constructor.newInstance();
-				FighterStats fs = new FighterStats();
-				fs.name = c.getName();
-				fs.accuracy = b.getAccuracy();
-				fs.defence = b.getDefence();
-				fs.evasion = b.getEvasion();
-				fs.health = b.getHealth();
-				fs.image = b.image;
-				fs.power = b.getPower();
-				fs.types = b.getTypes();
+				FighterStats fs = b.getStats();
 				res.add(fs);
 			}
 			System.out.println("Team info loaded");

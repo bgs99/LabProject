@@ -10,12 +10,14 @@ public abstract class Attack extends Move{
     public final static int DEFAULT_ACCURACY = 40;
     private int accuracy = DEFAULT_ACCURACY;
     private Types type;
+    private boolean physical;
     /**
      * Creates attack with given type
      * @param t Type of attack
      */
-    public Attack(Types t){
+    public Attack(Types t, boolean physical){
         type = t;
+        this.physical = physical;
     }
 
     /**
@@ -28,6 +30,7 @@ public abstract class Attack extends Move{
             accuracy+=amount;
         }
     }
+
     private List<Effect> effects = new ArrayList<>();
 
     /**
@@ -49,6 +52,16 @@ public abstract class Attack extends Move{
          * Creates effect with given type and level
          * @param t Type of effect
          * @param v Level of effect
+         * @param s Affected stat
+         */
+        public Effect(EffectType t, int v, BattleStats s) {
+            this(t, v);
+            this.stat = s;
+        }
+        /**
+         * Creates effect with given type and level
+         * @param t Type of effect
+         * @param v Level of effect
          */
         public Effect(EffectType t, int v){
             type = t;
@@ -56,6 +69,7 @@ public abstract class Attack extends Move{
         }
         EffectType type;
         int value;
+        BattleStats stat;
         final int cost(){
             return type.price*value;
         }
@@ -75,43 +89,57 @@ public abstract class Attack extends Move{
         /**
          * Applies raw damage
          */
-        DAMAGE(1, true),
+        DAMAGE(1),
         /**
-         * Adds periodic damage that gradually wears off
+         * Periodic damage, until the end of battle
          */
-        PERIODIC(5, true),
+        POISON(1),
         /**
-         * Damages target and heals user for a part of that damage
+         * Redused speed and chance of skipping
          */
-        LEECH(6, true),
+        PARALYSIS(1),
         /**
-         * Stuns target
+         * Periodic damage, reduced attack
          */
-        STUN(10, true),
+        BURN(1),
         /**
          * Heals target
          */
-        HEAL(4, false),
+        HEAL(1),
         /**
-         * Adds debuff to target's stats
+         * Cannot use moves
          */
-        STATS_DOWN(12, true),
+        SLEEP(12),
         /**
-         * Adds buff to your own stats
+         * Adds buff to your own stat
          */
-        STATS_UP(12, false);
-
+        STAT_UP(1),
+        /**
+         * Adds debuff to opponent's stat
+         */
+        STAT_DOWN(1),
+        /**
+         * Heals to some percent of the damage
+         */
+        LEECH(1),
+        /**
+         *Freezes opponent
+         */
+        FREEZE(10);
         int price;
-        boolean negative;
-        EffectType(int price, boolean negative) {
+
+        EffectType(int price) {
             this.price = price;
-            this.negative = negative;
         }
     }
     private boolean rollDice(Fighter attack, FighterInfo defence, OutputLogger logger){
         Random r = new Random();
         int v = r.nextInt(100);
-        if (v > accuracy + attack.getAccuracy() - defence.getEvasion()){
+        double stage = attack.getAccuracy() - defence.getEvasion();
+        stage = stage > 6 ? 6 : stage;
+        stage = stage < -6 ? -6 : stage;
+        double buff = stage >= 0 ? (3 + stage) / 3 : 3 / (3 - stage);
+        if (v > accuracy * buff){
             logger.log(defence + " evaded " + attack + "'s attack");
             return false;
         }
@@ -143,20 +171,20 @@ public abstract class Attack extends Move{
         boolean offence = false;
 
         int damageResult    = 0;
-        int debuffResult    = 0;
-        int stunResult      = 0;
-        int periodicResult  = 0;
         int healResult      = 0;
-        int buffResult      = 0;
 
         for(Effect e : effects){
 
             double valueK = 1;
 
-            FighterInfo target = e.type.negative ? b.currentOpponent() : b.currentFighter();
+            FighterInfo target = e.type != EffectType.HEAL ? b.currentOpponent() : b.currentFighter();
 
-            for(Types t : target.getTypes())
+            for(Types t : target.getTypes()) {
                 valueK *= checkEffect(type, t);
+                if (t == Types.FIRE) {
+                    target.unfreeze();
+                }
+            }
 
             if(valueK >=2 ) {
                 b.logger.log("It's super effective!");
@@ -175,14 +203,19 @@ public abstract class Attack extends Move{
 
                 case DAMAGE:
                     offence = true;
+                    int A = physical ? b.currentFighter().getAttack() : b.currentFighter().getSAttack();
+                    int D = physical ? b.currentFighter().getDefence() : b.currentFighter().getSDefence();
+
+                    int damage = 2 * A * value / D / 50 + 2;
+
                     damageResult += b.currentOpponent()
-                            .applyDamage(value + b.currentFighter().getPower(), b.logger);
+                            .applyDamage(damage, b.logger);
                     break;
 
-                case STATS_DOWN:
+                case STAT_DOWN:
                     offence = true;
-                    debuffResult = b.currentOpponent()
-                            .lowerStats(value);
+                    b.currentOpponent()
+                            .lowerStat(e.stat);
                     break;
 
                 case LEECH:
@@ -194,28 +227,35 @@ public abstract class Attack extends Move{
                     damageResult += dmg;
                     break;
 
-                case STUN:
+                case POISON:
                     offence = true;
                     b.currentOpponent()
-                            .addStun(value);
-                    stunResult += value;
+                            .poison();
                     break;
 
-                case PERIODIC:
+                case BURN:
                     offence = true;
-                    b.currentOpponent()
-                            .addPeriodicDamage(value, b.logger);
-                    periodicResult += value;
+                    b.currentOpponent().burn();
                     break;
 
-                case STATS_UP:
-                    buffResult = b.currentFighter()
-                            .increaseStats(value);
+                case STAT_UP:
+                    b.currentFighter()
+                            .increaseStat(e.stat);
                     break;
 
+                case SLEEP:
+                    b.currentOpponent().sleep();
+                    break;
+
+                case PARALYSIS:
+                    b.currentOpponent().paralyze();
+                    break;
+                case FREEZE:
+                    b.currentOpponent().freeze();
+                    break;
             }
         }
-        if(damageResult == 0 && debuffResult == 0 && stunResult == 0 && periodicResult == 0 && offence){
+        if(damageResult == 0 && offence){
             try {
                 String ignoredMessage = ((Fighter) b.currentOpponent()).defendedMessage(b.currentFighter());
                 b.logger.message(ignoredMessage, b.currentOpponent(), b.getCurrentPlayer());
@@ -238,11 +278,7 @@ public abstract class Attack extends Move{
                 b.currentFighter(),
                 new AttackResult(
                         damageResult,
-                        debuffResult,
-                        stunResult,
-                        periodicResult,
-                        healResult,
-                        buffResult
+                        healResult
                 ),
                 b.currentOpponent(),
                 b.getCurrentPlayer()

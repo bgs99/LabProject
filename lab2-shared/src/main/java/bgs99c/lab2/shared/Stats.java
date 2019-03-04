@@ -9,19 +9,23 @@ public enum Stats {
      */
     HEALTH,
     /**
-     * Ability to resist raw damage
+     * Ability to resist physical damage
      */
     DEFENCE,
     /**
-     * Ability not to miss opponent with attacks
+     * Ability to attack first
      */
-    ACCURACY,
+    SPEED,
     /**
-     * Ability to evade opponent's attacks
+     * Ability to deal physical damage
      */
-    EVASION,
+    ATTACK,
     /**
-     * Ability to deal raw damage
+     * Ability to deal non-physical damage
      */
-    POWER
+    SPECIAL_ATTACK,
+    /**
+     * Ability to resist non-physical damage
+     */
+    SPECIAL_DEFENCE
 }

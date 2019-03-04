@@ -1,5 +1,7 @@
 package bgs99c.shared;
 
+import bgs99c.lab2.shared.FighterStats;
+
 import java.io.Serializable;
 import java.util.List;
 

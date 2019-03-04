@@ -1,6 +1,6 @@
 package JavaTournament;
 
-import bgs99c.shared.FighterStats;
+import bgs99c.lab2.shared.FighterStats;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;

@@ -9,7 +9,7 @@ import java.util.Random;
 
 public abstract class Attack extends Move{
 public final static int DEFAULT_ACCURACY = 40;
-public Attack(Types t){
+public Attack(Types t, boolean physical){
 throw new UnsupportedOperationException();
 }
 protected final void changeAccuracy(int amount){
@@ -23,6 +23,16 @@ public final class Effect{
          * Creates effect with given type and level
          * @param t Type of effect
          * @param v Level of effect
+         * @param s Affected stat
+         */
+        public Effect(EffectType t, int v, BattleStats s) {
+            this(t, v);
+            this.stat = s;
+        }
+        /**
+         * Creates effect with given type and level
+         * @param t Type of effect
+         * @param v Level of effect
          */
         public Effect(EffectType t, int v){
             type = t;
@@ -30,6 +40,7 @@ public final class Effect{
         }
         EffectType type;
         int value;
+        BattleStats stat;
         final int cost(){
             return type.price*value;
         }
@@ -40,37 +51,47 @@ public enum EffectType{
         /**
          * Applies raw damage
          */
-        DAMAGE(1, true),
+        DAMAGE(1),
         /**
-         * Adds periodic damage that gradually wears off
+         * Periodic damage, until the end of battle
          */
-        PERIODIC(5, true),
+        POISON(1),
         /**
-         * Damages target and heals user for a part of that damage
+         * Redused speed and chance of skipping
          */
-        LEECH(6, true),
+        PARALYSIS(1),
         /**
-         * Stuns target
+         * Periodic damage, reduced attack
          */
-        STUN(10, true),
+        BURN(1),
         /**
          * Heals target
          */
-        HEAL(4, false),
+        HEAL(1),
         /**
-         * Adds debuff to target's stats
+         * Cannot use moves
          */
-        STATS_DOWN(12, true),
+        SLEEP(12),
         /**
-         * Adds buff to your own stats
+         * Adds buff to your own stat
          */
-        STATS_UP(12, false);
-
+        STAT_UP(1),
+        /**
+         * Adds debuff to opponent's stat
+         */
+        STAT_DOWN(1),
+        /**
+         * Heals to some percent of the damage
+         */
+        LEECH(1),
+        /**
+         *Freezes opponent
+         */
+        FREEZE(10);
         int price;
-        boolean negative;
-        EffectType(int price, boolean negative) {
+
+        EffectType(int price) {
             this.price = price;
-            this.negative = negative;
         }
     }
 

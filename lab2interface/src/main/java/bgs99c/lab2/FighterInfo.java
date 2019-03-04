@@ -1,8 +1,8 @@
 
 package bgs99c.lab2;
 import bgs99c.lab2.shared.*;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.*;
 
 public abstract class FighterInfo {
 public final int hashCode() {

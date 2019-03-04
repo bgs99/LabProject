@@ -92,14 +92,14 @@ class Soldier extends Fighter{
         id++;
         addMove(new Punch());
         increaseStat(5, Stats.DEFENCE);
-        increaseStat(5, Stats.POWER);
+        increaseStat(5, Stats.ATTACK);
         increaseStat(5, Stats.HEALTH);
-        increaseStat(5, Stats.EVASION);
+        increaseStat(5, Stats.SPEED);
     }
 }
 class Punch extends Attack {
     Punch(){
-        super(Types.FIGHTING);
+        super(Types.FIGHTING, true);
         addEffect(new Effect(EffectType.DAMAGE, Move.ABLPOINTS));
     }
     @Override

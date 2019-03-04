@@ -8,7 +8,8 @@ public abstract class Fighter extends FighterInfo{
 public final FighterStats getStats() {
 throw new UnsupportedOperationException();
 }
-public final static int HEALTH = 50, DEFENCE = 10, ACCURACY = 20, EVASION = 10, POWER = 5;
+public final static int HEALTH = 50, DEFENCE = 10, SPEED = 20,
+            ATTACK = 10, SPECIAL_ATTACK = 5, SPECIAL_DEFENCE = 10;
 public final void addType(Types t){
 throw new UnsupportedOperationException();
 }
@@ -28,7 +29,13 @@ throw new UnsupportedOperationException();
 public final int getDefence() {
 throw new UnsupportedOperationException();
 }
-public final int getPower() {
+public final int getAttack() {
+throw new UnsupportedOperationException();
+}
+public final int getSAttack() {
+throw new UnsupportedOperationException();
+}
+public final int getSDefence() {
 throw new UnsupportedOperationException();
 }
 public Fighter(String n){

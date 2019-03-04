@@ -10,21 +10,27 @@ public abstract class Fighter extends FighterInfo{
     
     public final FighterStats getStats() {
     	FighterStats ret = new FighterStats();
-    	ret.accuracy = accuracy;
+
+        ret.maxhealth = maxhealth;
+
+        ret.speed = speed;
     	ret.defence = defence;
-    	ret.evasion = evasion;
-    	ret.maxhealth = maxhealth;
-    	ret.power = power;
+    	ret.s_defence = s_defence;
+    	ret.s_attack = s_attack;
+    	ret.attack = attack;
     	ret.health = health;
+
     	ret.img = image;
     	ret.name = this.toString();
+    	ret.types = getTypes();
     	return ret;
     }
     
     /**
      * Fighter's base stats
      */
-    public final static int HEALTH = 50, DEFENCE = 10, ACCURACY = 20, EVASION = 10, POWER = 5;
+    public final static int HEALTH = 50, DEFENCE = 10, SPEED = 20,
+            ATTACK = 10, SPECIAL_ATTACK = 5, SPECIAL_DEFENCE = 10;
     final void reset(){
         health = maxhealth;
     }
@@ -43,8 +49,9 @@ public abstract class Fighter extends FighterInfo{
      * Fighter's avatar
      */
     public String image = "";
-    private int maxhealth = HEALTH, health = HEALTH, defence = DEFENCE, accuracy = ACCURACY,
-            evasion = EVASION, power = POWER, movesLeft = MAXMOVES;
+    private int maxhealth = HEALTH, health = HEALTH, defence = DEFENCE, speed = SPEED,
+            attack = ATTACK, s_attack = SPECIAL_ATTACK, s_defence = SPECIAL_DEFENCE,
+            movesLeft = MAXMOVES;
     private List<Integer> periodicDamages = new ArrayList<>();
     private List<Move> moves = new ArrayList<>();
 
@@ -60,7 +67,7 @@ public abstract class Fighter extends FighterInfo{
      * @param m New move
      */
     public final void addMove(Move m){
-        if(movesLeft <=0){
+        if(movesLeft <= 0){
             throw new OPError();
         }
         movesLeft--;
@@ -92,17 +99,17 @@ public abstract class Fighter extends FighterInfo{
     }
     @Override
     final int applyDamage(int amount, OutputLogger logger){
-        if(amount <= defence){
+        if(amount <= 0){
             logger.log("This attack is too weak");
             return 0;
         }
-        logger.log("It did " + (amount-defence) + " damage");
-        health -= amount - defence;
-        return amount - defence;
+        logger.log("It did " + amount + " damage");
+        health -= amount;
+        return amount;
     }
     final int heal(int amount, OutputLogger logger){
         int previousHealth = health;
-        health += amount;
+        health += amount * previousHealth / 100;
         health = health > maxhealth ? maxhealth : health;
         logger.log(this + "is healed for " + (health - previousHealth) + " HP.");
         return health - previousHealth;
@@ -112,7 +119,7 @@ public abstract class Fighter extends FighterInfo{
      * Returns accuracy considering debuff
      */
     public final int getAccuracy(){
-        return accuracy - getDebuff();
+        return stages.get(BattleStats.ACCURACY);
     }
 
     /**
@@ -120,19 +127,30 @@ public abstract class Fighter extends FighterInfo{
      */
     @Override
     public final int getEvasion() {
-        return evasion - getDebuff();
+        return stages.get(BattleStats.EVASION);
     }
     public final int getDefence() {
-    	return defence - getDebuff();
+        return getWithDebuff(BattleStats.DEFENCE, defence);
     }
 
-    /**
-     * Returns power considering debuff
-     */
-    public final int getPower() {
-        return power - getDebuff();
+    private int getWithDebuff(BattleStats s, int val) {
+        double stage = stages.get(s);
+        double buff = stage >= 0 ? (2 + stage) / 2 : 2 / (2 + stage);
+        return (int)(val * buff);
     }
 
+    public final int getAttack() {
+        return getWithDebuff(BattleStats.ATTACK, attack) / (burn ? 2 : 1);
+    }
+
+    public final int getSAttack() {
+        return getWithDebuff(BattleStats.SPECIAL_ATTACK, s_attack);
+    }
+
+    @Override
+    public final int getSDefence() {
+        return getWithDebuff(BattleStats.SPECIAL_DEFENCE, s_defence);
+    }
     /**
      * Creates fighter with given name
      * @param n Name
@@ -152,9 +170,6 @@ public abstract class Fighter extends FighterInfo{
         }
         talentPoints -= amount;
         switch (stat){
-            case POWER:
-                power       += amount;
-                break;
             case HEALTH:
                 maxhealth   += amount;
                 health      += amount;
@@ -162,11 +177,17 @@ public abstract class Fighter extends FighterInfo{
             case DEFENCE:
                 defence     += amount;
                 break;
-            case EVASION:
-                evasion     += amount;
+            case SPEED:
+                speed     += amount;
                 break;
-            case ACCURACY:
-                accuracy    += amount;
+            case ATTACK:
+                attack    += amount;
+                break;
+            case SPECIAL_DEFENCE:
+                s_defence += amount;
+                break;
+            case SPECIAL_ATTACK:
+                s_attack += amount;
                 break;
         }
     }
@@ -203,5 +224,10 @@ public abstract class Fighter extends FighterInfo{
     }
     final void addTalentPoints(){
         talentPoints += LVLPOINTS;
+    }
+
+    @Override
+    final int getSpeed() {
+        return getWithDebuff(BattleStats.SPEED, speed) / (paralyzis ? 4 : 1);
     }
 }
