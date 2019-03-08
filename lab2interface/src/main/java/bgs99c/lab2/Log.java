@@ -32,6 +32,6 @@ public abstract class Log implements Serializable{
     }
 
     public enum LogType{
-        ATTACK, REPLACEMENT, DEATH, FAIL, TEAM, MESSAGE, STATUS_EFFECTS,
+        ATTACK, REPLACEMENT, DEATH, STATUS_EFFECTS, FAIL, TEAM, MESSAGE,
     }
 }
