@@ -78,9 +78,17 @@ public abstract class Fighter extends FighterInfo{
         int hp_loss = Math.max(health / 16, 1);
         StatusEffectsLog ret = new StatusEffectsLog(this, you);
         ret.stunned = isStunned();
-        ret.burn = isBurning() ? hp_loss : 0;
-        ret.poison = isPoisoned() ? hp_loss : 0;
-        this.health -= ret.burn + ret.poison;
+        if(ret.stunned)
+            logger.log("Cannot move for this turn");
+        if (isBurning()) {
+            ret.burn = hp_loss;
+            logger.log("Burning for " + hp_loss + "hp");
+        }
+        if (isPoisoned()) {
+            ret.poison = hp_loss;
+            logger.log("Getting " + hp_loss + " poison damage");
+        }
+        this.health -= ret.getDamage();
         return ret;
     }
     @Override
