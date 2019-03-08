@@ -162,8 +162,8 @@ public class BattleController {
 					}
 					updateFighters(team);
 					break;
-				case LASTING:
-					PeriodicDamageLog pd = (PeriodicDamageLog)l;
+				case STATUS_EFFECTS:
+					StatusEffectsLog pd = (StatusEffectsLog) l;
 					if(pd.getDamage() == 0)
 						break;
 					team.get(pd.getSubject()).health -= pd.getDamage();

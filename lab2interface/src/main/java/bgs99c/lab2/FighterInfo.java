@@ -20,4 +20,19 @@ public final String toString(){
 throw new UnsupportedOperationException();
 }
 public abstract double getHealthBar();
+public final boolean isPoisoned() {
+throw new UnsupportedOperationException();
+}
+public final boolean isBurning() {
+throw new UnsupportedOperationException();
+}
+public final boolean isAsleep() {
+throw new UnsupportedOperationException();
+}
+public final boolean isFrozen() {
+throw new UnsupportedOperationException();
+}
+public final boolean isParalyzed() {
+throw new UnsupportedOperationException();
+}
 }

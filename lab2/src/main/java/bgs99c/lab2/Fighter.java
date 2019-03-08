@@ -52,7 +52,7 @@ public abstract class Fighter extends FighterInfo{
     private int maxhealth = HEALTH, health = HEALTH, defence = DEFENCE, speed = SPEED,
             attack = ATTACK, s_attack = SPECIAL_ATTACK, s_defence = SPECIAL_DEFENCE,
             movesLeft = MAXMOVES;
-    private List<Integer> periodicDamages = new ArrayList<>();
+
     private List<Move> moves = new ArrayList<>();
 
     /**
@@ -74,28 +74,14 @@ public abstract class Fighter extends FighterInfo{
         moves.add(m);
     }
     @Override
-    final Log applyPeriodicDamages(Player you, OutputLogger logger){
-        int sum = 0;
-        for(int i = 0; i < periodicDamages.size(); i++){
-            int damage = periodicDamages.get(i);
-            logger.log(this + " is losing " + damage + " HP because of periodic damage.");
-            health -= damage;
-            sum += damage;
-            periodicDamages.set(i, damage-1);
-            if(damage <= 0){
-                periodicDamages.remove(i);
-                i--;
-            }
-        }
-        return new PeriodicDamageLog(this, you, sum);
-    }
-    @Override
-    final void addPeriodicDamage(int value, OutputLogger logger){
-        if(value < 0){
-            return;
-        }
-        logger.log("It's " + value + " points of periodic damage!");
-        periodicDamages.add(value);
+    final StatusEffectsLog applyStatusEffects(Player you, OutputLogger logger){
+        int hp_loss = Math.max(health / 16, 1);
+        StatusEffectsLog ret = new StatusEffectsLog(this, you);
+        ret.stunned = isStunned();
+        ret.burn = isBurning() ? hp_loss : 0;
+        ret.poison = isPoisoned() ? hp_loss : 0;
+        this.health -= ret.burn + ret.poison;
+        return ret;
     }
     @Override
     final int applyDamage(int amount, OutputLogger logger){

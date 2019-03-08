@@ -43,25 +43,15 @@ public abstract class FighterInfo {
     protected int typePoints = 0;
 
     
-    abstract Log applyPeriodicDamages(Player you, OutputLogger logger);
-    final boolean applyStuns() {
-        if(stun <= 0) {
-            return false;
-        }
-        stun--;
-        return true;
-    }
-    private int stun = 0;
+    abstract StatusEffectsLog applyStatusEffects(Player you, OutputLogger logger);
+
     boolean paralyzis = false;
     private boolean poison = false;
     private int sleep = 0;
     boolean burn = false;
     private boolean flinch = false;
     private boolean frozen = false;
-    final void addStun(int time){
-        stun = (stun > time) ? stun : time;
-    }
-    abstract void addPeriodicDamage(int value, OutputLogger logger);
+
     public final String toString(){
         return this.getClass().getSimpleName() + " " + name;
     }
@@ -94,6 +84,10 @@ public abstract class FighterInfo {
         return -1;
     }
 
+    final void flinch() {
+        this.flinch = true;
+    }
+
     final void poison() {
         this.poison = true;
     }
@@ -119,5 +113,34 @@ public abstract class FighterInfo {
 
     final void unfreeze() {
         this.frozen = false;
+    }
+
+    public final boolean isPoisoned() {
+        return poison;
+    }
+
+    public final boolean isBurning() {
+        return burn;
+    }
+
+    public final boolean isAsleep() {
+        return  sleep > 0;
+    }
+
+    public final boolean isFrozen() {
+        return frozen;
+    }
+
+    public final boolean isParalyzed() {
+        return paralyzis;
+    }
+
+    final boolean isStunned() {
+        Random r = new Random();
+        boolean paralysisFail = r.nextInt(4) == 3;
+        boolean result = sleep > 0 || (paralyzis && paralysisFail) || flinch || frozen;
+        this.flinch = false;
+        this.sleep = sleep == 0 ? 0 : sleep - 1;
+        return result;
     }
 }

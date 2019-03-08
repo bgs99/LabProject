@@ -168,11 +168,11 @@ public final class Battle {
 
         currentPlayer = team.player;
 
-        Log periodicDamages = team.current.applyPeriodicDamages(currentPlayer, logger);
-        record(periodicDamages);
+        StatusEffectsLog statusEffects = team.current.applyStatusEffects(currentPlayer, logger);
+        record(statusEffects);
 
 
-        if(team.current.getHealth()<=0){
+        if(team.current.getHealth() <= 0){
             logger.message(team.current.dyingMessage(opponentFighter()), team.current, team.player);
         	record(new DeathLog(team.current, currentPlayer));
 
@@ -197,7 +197,7 @@ public final class Battle {
 
             logger.log(team.current + " replaced his fallen ally.");
         }
-        if(!team.current.applyStuns()) {
+        if(!statusEffects.stunned) {
             Action a = team.player.getStrategy().makeTurn();
             Log result = a.apply(this);
             record(result);
