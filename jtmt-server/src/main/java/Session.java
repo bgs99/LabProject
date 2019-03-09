@@ -148,7 +148,13 @@ public final class Session implements Closeable, Runnable{
 			System.out.println("Created game.");
 
 			while (true) {
-				Protocol action = Protocol.fromInt(ois.read());
+				int protocolId = ois.read();
+
+				// End of stream
+				if (protocolId < 0)
+					break;
+
+				Protocol action = Protocol.fromInt(protocolId);
                 System.out.println("Received action: " + action);
 				switch (action) {
 					case STATS:
@@ -174,8 +180,9 @@ public final class Session implements Closeable, Runnable{
 						oos.write(0);
 						oos.flush();
 						break;
+					case UNKNOWN:
 					default:
-						System.err.println("Unknown protocol action: " + action);
+						System.err.println("Unknown protocol action: " + action + ", id: " + protocolId);
 						break;
 				}
 			}

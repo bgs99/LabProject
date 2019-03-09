@@ -1,14 +1,12 @@
 package bgs99c.shared;
 
 public enum Protocol {
-	NONE, SEND_FILE, BATTLE, TOURNAMENT, FEEDBACK, STATUS, STATS;
+	NONE, SEND_FILE, BATTLE, TOURNAMENT, FEEDBACK, STATUS, STATS, UNKNOWN;
+
 	private static Protocol[] vals = Protocol.values();
 	public static Protocol fromInt(int ind) {
 		if(ind <=0)
-			return NONE;
+			return UNKNOWN;
 		return vals[ind];
-	}
-	public byte toByte() {
-		return (byte)this.ordinal();
 	}
 }

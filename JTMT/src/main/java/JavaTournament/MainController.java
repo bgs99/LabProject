@@ -61,12 +61,14 @@ class LoginPanel extends JPanel implements KeyListener {
         Font CustomFont;
         Font customFont18 = null;
         try {
-
             URL resource  = ScreenController.class.getResource("/beermoney.ttf");
+            if (resource == null) {
+                System.err.println("Failed to get resource: /beermoney.ttf");
+                return;
+            }
             String TTFpath = Paths.get(resource.toURI()).toString();
             CustomFont = Font.createFont(Font.TRUETYPE_FONT, new FileInputStream(TTFpath));
             customFont18 = CustomFont.deriveFont(19.0F); //11 шрифт
-
         }
         catch (FontFormatException | IOException | URISyntaxException e2) 	 {e2.printStackTrace();}
 
