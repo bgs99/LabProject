@@ -17,7 +17,9 @@ public class Tournament {
     private Timestamp date;
 
     protected Tournament() {
-
+        this.player = null;
+        this.position = -1;
+        this.date = new Timestamp(System.nanoTime());
     }
 
     public Tournament(User player, int position) {

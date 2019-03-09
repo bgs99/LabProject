@@ -1,4 +1,7 @@
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import bgs99c.shared.UserStats;
@@ -10,6 +13,7 @@ import javax.persistence.Persistence;
 
 class DBManager {
 	private EntityManager manager;
+	private static ReentrantLock lock = new ReentrantLock();
 
     DBManager() {
         EntityManagerFactory factory = Persistence.createEntityManagerFactory( "HIBERNATE_JPA" );
@@ -17,29 +21,51 @@ class DBManager {
     }
 
     private User getUserByName(String name) {
-		return manager.createNamedQuery("User.findByName", User.class).setParameter("name", name)
-				.getResultStream().findAny().orElse(null);
+    	try {
+    		lock.lock();
+			return manager.createNamedQuery("User.findByName", User.class).setParameter("name", name)
+					.getResultStream().findAny().orElse(null);
+		}
+		finally {
+    		lock.unlock();
+		}
 	}
 
 	UserStats[] getUsers() {
     	System.out.println("getUsers() called");
-		Stream<User> st = manager.createNamedQuery("User.findAll", User.class).getResultStream();
-		System.out.println("Created named query.");
 
-		/*return st.map(q -> new UserStats(
-				q.getName(),
-				q.lastScore(),
-				1,
+        List<User> users = null;
+
+    	try {
+            lock.lock();
+            Stream<User> st = manager.createNamedQuery("User.findAll", User.class).getResultStream();
+            System.out.println("Created named query.");
+
+            users = st.collect(Collectors.toList());
+            System.out.println("Got users list.");
+        }
+        finally {
+    	    lock.unlock();
+        }
+
+		List<UserStats> stats = new ArrayList<>();
+		users.forEach(u -> stats.add(new UserStats(
+				u.getName(),
+				u.lastScore(),
+				u.averageScore(),
 				0,
-				Loader.teamInfo(q.getName())
-		)).toArray(UserStats[]::new);*/
-		return st.map(q -> new UserStats(
-                        q.getName(),
-                        q.lastScore(),
-                        q.averageScore(),
-                        0,
-                        Loader.teamInfo(q.getName())
-                )).toArray(UserStats[]::new);
+				Loader.teamInfo(u.getName())
+		)));
+
+		return stats.toArray(new UserStats[stats.size()]);
+
+//		return st.map(q -> new UserStats(
+//                        q.getName(),
+//                        q.lastScore(),
+//                        q.averageScore(),
+//                        0,
+//                        Loader.teamInfo(q.getName())
+//                )).toArray(UserStats[]::new);
 	}
 
 	void recordTournament(List<String> players) {
@@ -53,8 +79,10 @@ class DBManager {
 		manager.getTransaction().commit();
 	}
 
-	byte getSalt(String name) {
-    	List<User> u = manager.createQuery("select u from User u", User.class).getResultList();
+	byte getSalt(String name) throws Exception {
+    	//if (!manager.isOpen())
+    	//	throw new Exception("Trying to use closed EntityManager.");
+    	//List<User> u = manager.createQuery("select u from User u", User.class).getResultList();
     	return getUserByName(name).getSalt();
 	}
 

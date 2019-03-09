@@ -8,9 +8,10 @@ public class ManyClientTest {
     private static volatile int clientsFailed = 0;
     private static volatile int clientsSucceeded = 0;
 
-    public static void main(String[] args) {
-        int CLIENT_COUNT = 100;
+    private static final int CLIENT_COUNT = 2;
+    private static final boolean IS_FULL_STACK_TRACE = true;
 
+    public static void main(String[] args) {
         for (int i = 0; i < CLIENT_COUNT; i++) {
             Thread t = new Thread(ManyClientTest::processClient);
             t.start();
@@ -20,6 +21,7 @@ public class ManyClientTest {
         while (clientsFailed + clientsSucceeded < CLIENT_COUNT)
             Thread.yield();
 
+        System.out.println("------------");
         System.out.println("Total " + clientsSucceeded + " finished successfully.");
         System.out.println("Total " + clientsFailed + " failed.");
     }
@@ -48,11 +50,15 @@ public class ManyClientTest {
             clientsSucceeded += 1;
         }
         catch (Exception e) {
-            //e.printStackTrace();
             System.out.println("Client " + curClient + " FAILED TO CONNECT!");
-            StackTraceElement frame = e.getStackTrace()[e.getStackTrace().length - 2];
-            System.out.println(frame.getFileName() + ":" + frame.getLineNumber());
             clientsFailed += 1;
+
+            if (IS_FULL_STACK_TRACE)
+                e.printStackTrace();
+            else {
+                StackTraceElement frame = e.getStackTrace()[e.getStackTrace().length - 2];
+                System.out.println(frame.getFileName() + ":" + frame.getLineNumber());
+            }
         }
 
         System.out.println("Client " + curClient + " finished.");

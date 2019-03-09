@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Entity
 @NamedQueries({
@@ -22,7 +23,7 @@ public class User {
     private byte salt;
     private String password;
     @OneToMany(mappedBy = "player")
-    private List<Tournament> tournaments;
+    private List<Tournament> tournaments = null;
 
     protected User() {
 
@@ -46,12 +47,18 @@ public class User {
         if (tournaments == null)
             return -1;
 
-        Tournament[] t = tournaments.stream().toArray(Tournament[]::new);
-        if (t.length < 1)
-            return -1;
+        try {
+            Tournament[] t = tournaments.toArray(new Tournament[tournaments.size()]);
+            if (t.length < 1)
+                return -1;
 
-        Arrays.sort(t, Comparator.comparing(Tournament::getDate));
-        return t[t.length - 1].getPosition();
+            Arrays.sort(t, Comparator.comparing(Tournament::getDate));
+            return t[t.length - 1].getPosition();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
 
         /*return tournaments.stream().sorted()
                .max(Comparator.comparing(Tournament::getDate))
@@ -59,8 +66,14 @@ public class User {
     }
 
     public double averageScore() {
-        double len = tournaments.size();
-        return tournaments.stream().map(Tournament::getPosition).reduce(0, (a, b) -> a+b) / len;
+        try {
+            double len = tournaments.size();
+            return tournaments.stream().map(Tournament::getPosition).reduce(0, (a, b) -> a + b) / len;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
     public boolean checkPassword(String password, byte sessionSalt){

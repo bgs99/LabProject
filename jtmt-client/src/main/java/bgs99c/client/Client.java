@@ -21,20 +21,26 @@ import java.util.stream.Collectors;
 import com.jcraft.jsch.*;
 
 public class Client implements Closeable {
-	private ObjectOutputStream oos;
-	private ObjectInputStream ois;
+	private ObjectOutputStream oos = null;
+	private ObjectInputStream ois = null;
 	private Socket socket = null;
 	private Lock lock = new ReentrantLock();
 	public String name;
 
 	@Override
 	public void close() throws IOException {
-		if(oos != null && ois != null ) {
+		if (oos != null) {
 			oos.close();
-			ois.close();
+			oos = null;
 		}
-		if(socket != null)
+		if(ois != null ) {
+			ois.close();
+			ois = null;
+		}
+		if (socket != null) {
 			socket.close();
+			socket = null;
+		}
 	}
 
 	public boolean init(String name, String pass) throws IOException {

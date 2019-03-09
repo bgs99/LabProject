@@ -42,7 +42,8 @@ public final class Session implements Closeable, Runnable{
 		} catch (Exception e) {
 			oos.write(1);
 			oos.flush();
-			System.out.println("Failed to get salt for such user.");
+			System.out.println("Failed to get salt for user: " + name);
+			e.printStackTrace();
 			return false;
 		}
 		oos.write(0);
@@ -121,7 +122,9 @@ public final class Session implements Closeable, Runnable{
 	}
 
 	private synchronized void makeBattle(String opponent) throws IOException, SQLException {
+	    System.out.println("Making battle...");
 		String winner = game.Battle(this.name, opponent);
+		System.out.println("Winner: " + winner);
 		List<String> ps = new ArrayList<String>();
 		ps.add(name);
 		ps.add(opponent);
@@ -132,6 +135,7 @@ public final class Session implements Closeable, Runnable{
 		oos.writeObject(rs);
 		oos.writeObject(Game.logs);
 		oos.flush();
+		System.out.println("Finished sending battle info.");
 	}
 
 	@Override
@@ -186,8 +190,13 @@ public final class Session implements Closeable, Runnable{
 						break;
 				}
 			}
-		} catch (IOException | SQLException e) {
+		}// catch (IOException | SQLException e) {
+        catch (Exception e) {
 		    e.printStackTrace();
+		    try {
+                close();
+            }
+            catch (Exception innerE) {}
 			Thread.currentThread().interrupt();
 		}
 	}
