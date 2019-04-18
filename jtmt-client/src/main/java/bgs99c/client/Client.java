@@ -161,7 +161,15 @@ public class Client implements Closeable {
 		}
 	}
 
-	public void sendFile(File file) throws IOException {
+	public boolean isFileTooBig(File file) {
+		final long MAX_FILE_SIZE = 16 * 1024 * 1024; // 16 MiB. Maybe move to config?
+		return file.length() > MAX_FILE_SIZE;
+	}
+
+	public boolean sendFile(File file) throws IOException {
+		if (isFileTooBig(file))
+			return false;
+
         lock.lock();
 		try {
 			useProtocol(Protocol.SEND_FILE);
@@ -176,7 +184,8 @@ public class Client implements Closeable {
 			oos.flush();
 		} finally {
 			lock.unlock();
-		} 
+		}
+		return true;
 	}
 
 	private void useProtocol(Protocol protocol) throws IOException {
