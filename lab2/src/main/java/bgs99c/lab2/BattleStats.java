@@ -1,0 +1,5 @@
+package bgs99c.lab2;
+
+public enum BattleStats {
+    HP, ATTACK, SPECIAL_ATTACK, DEFENCE, SPECIAL_DEFENCE, SPEED, EVASION, ACCURACY
+}

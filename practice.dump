@@ -1,0 +1,144 @@
+
+
+--
+-- Name: logins; Type: TABLE; Schema: public; Owner: bgs99c
+--
+
+CREATE TABLE public.logins (
+    id integer NOT NULL,
+    name text,
+    salt smallint,
+    password text
+);
+
+
+
+--
+-- Name: logins_id_seq; Type: SEQUENCE; Schema: public; Owner: bgs99c
+--
+
+CREATE SEQUENCE public.logins_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+
+--
+-- Name: logins_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: bgs99c
+--
+
+ALTER SEQUENCE public.logins_id_seq OWNED BY public.logins.id;
+
+
+--
+-- Name: tournaments; Type: TABLE; Schema: public; Owner: bgs99c
+--
+
+CREATE TABLE public.tournaments (
+    player integer,
+    "position" integer,
+    date timestamp without time zone,
+    id integer NOT NULL
+);
+
+
+
+--
+-- Name: tournaments_id_seq; Type: SEQUENCE; Schema: public; Owner: bgs99c
+--
+
+CREATE SEQUENCE public.tournaments_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+
+--
+-- Name: tournaments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: bgs99c
+--
+
+ALTER SEQUENCE public.tournaments_id_seq OWNED BY public.tournaments.id;
+
+
+--
+-- Name: logins id; Type: DEFAULT; Schema: public; Owner: bgs99c
+--
+
+ALTER TABLE ONLY public.logins ALTER COLUMN id SET DEFAULT nextval('public.logins_id_seq'::regclass);
+
+
+--
+-- Name: tournaments id; Type: DEFAULT; Schema: public; Owner: bgs99c
+--
+
+ALTER TABLE ONLY public.tournaments ALTER COLUMN id SET DEFAULT nextval('public.tournaments_id_seq'::regclass);
+
+
+--
+-- Data for Name: logins; Type: TABLE DATA; Schema: public; Owner: bgs99c
+--
+
+COPY public.logins (id, name, salt, password) FROM stdin;
+4	s242322	-72	3D2C8A129939D7DB33A235CCF93F0DEE800691D48732178CEB258C9E91450B25
+1	Player4	0	DEADBEEF
+\.
+
+
+--
+-- Data for Name: tournaments; Type: TABLE DATA; Schema: public; Owner: bgs99c
+--
+
+COPY public.tournaments (player, "position", date, id) FROM stdin;
+\.
+
+
+--
+-- Name: logins_id_seq; Type: SEQUENCE SET; Schema: public; Owner: bgs99c
+--
+
+SELECT pg_catalog.setval('public.logins_id_seq', 4, true);
+
+
+--
+-- Name: tournaments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: bgs99c
+--
+
+SELECT pg_catalog.setval('public.tournaments_id_seq', 1, false);
+
+
+--
+-- Name: logins logins_pkey1; Type: CONSTRAINT; Schema: public; Owner: bgs99c
+--
+
+ALTER TABLE ONLY public.logins
+    ADD CONSTRAINT logins_pkey1 PRIMARY KEY (id);
+
+
+--
+-- Name: tournaments tournaments_pk; Type: CONSTRAINT; Schema: public; Owner: bgs99c
+--
+
+ALTER TABLE ONLY public.tournaments
+    ADD CONSTRAINT tournaments_pk PRIMARY KEY (id);
+
+
+--
+-- Name: tournaments fkgxwyy9sjivs89kbluk5qy4gss; Type: FK CONSTRAINT; Schema: public; Owner: bgs99c
+--
+
+ALTER TABLE ONLY public.tournaments
+    ADD CONSTRAINT fkgxwyy9sjivs89kbluk5qy4gss FOREIGN KEY (player) REFERENCES public.logins(id);
+
+
+--
+-- PostgreSQL database dump complete
+--
+
